@@ -1,0 +1,42 @@
+{
+  "username": "niltonperimneto",
+  "name": "NILTON PERIM NETO",
+  "tagline": "Not a Programmer, just a historian.",
+  "location": "Goiás, Brazil",
+  "affiliation": "Universidade Federal de Goiás",
+  "system_env": "x86_64 // ARM64 // Linux & macOS",
+  "coordinates": "-16.6869° S, 49.2648° W",
+  "featured_repos": [
+    {
+      "name": "twister",
+      "desc": "Desktop-agnostic GUI for Linux gaming mice",
+      "stack": "TS / Linux",
+      "stars": 11
+    },
+    {
+      "name": "neocalc-core",
+      "desc": "Rust math engine judging your skills",
+      "stack": "Rust",
+      "stars": 1
+    },
+    {
+      "name": "libratbag-rs",
+      "desc": "DBus daemon for high-end gaming mice",
+      "stack": "Rust / DBus",
+      "stars": 1
+    },
+    {
+      "name": "lemurs",
+      "desc": "Customizable TUI display & login manager",
+      "stack": "Rust / TUI",
+      "stars": 0
+    }
+  ],
+  "focus_languages": [
+    { "name": "Rust", "pct": 42 },
+    { "name": "TypeScript", "pct": 28 },
+    { "name": "Python", "pct": 18 },
+    { "name": "C / Asm", "pct": 12 }
+  ],
+  "exclude_repos_from_stats": ["winecx", "mesa", "dxmt"]
+}
