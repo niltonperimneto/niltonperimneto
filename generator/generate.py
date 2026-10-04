@@ -1,4 +1,3 @@
-from pathlib import Path
 #!/usr/bin/env python3
 import json
 import os
@@ -8,6 +7,7 @@ import urllib.request
 import base64
 import html
 import math
+from pathlib import Path
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(BASE_DIR, "config.json")
@@ -188,7 +188,6 @@ def fetch_github_data(username):
         }
     }
 
-
 def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
     if config is None:
         config = {}
@@ -222,9 +221,7 @@ def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
         accent_stroke = "#1e293b"
         accent_fill_opacity = 0.08
 
-    total_repos = data.get("repositories", {}).get("totalCount", 30)
     cal = data.get("contributionsCollection", {}).get("contributionCalendar", {})
-    total_contribs = cal.get("totalContributions", 963)
     weeks = cal.get("weeks", [])
     
     weekly_counts = []
@@ -243,8 +240,8 @@ def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
     # Wide Activity chart dimensions
     wave_x = 42
     wave_w = 716
-    wave_y_base = 340
-    wave_y_top = 286
+    wave_y_base = 350
+    wave_y_top = 296
     wave_h = wave_y_base - wave_y_top
 
     points = []
@@ -273,6 +270,20 @@ def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
         {"name": "Assembly", "slug": "assemblyscript"}
     ])[:6]
 
+    # Target Platforms
+    platforms = config.get("platforms", [
+        {"name": "Linux", "badge": "Kernel · Drivers"},
+        {"name": "macOS", "badge": "Darwin · Systems"},
+        {"name": "Web", "badge": "Wasm · Modern UI"}
+    ])[:3]
+
+    # Project Scope Breakdown for Pie Chart
+    project_scopes = config.get("project_scopes", [
+        {"name": "Drivers & Low-Level", "pct": 45},
+        {"name": "User Interface / GUI", "pct": 35},
+        {"name": "Systems & Daemons", "pct": 20}
+    ])[:3]
+
     featured = config.get("featured_repos", [])[:4]
     
     raw_name = config.get("name", "Nilton Perim Neto")
@@ -293,7 +304,7 @@ def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
         avatar_svg = f"""      <rect x="36" y="28" width="48" height="48" fill="{inner_bg}" stroke="{border}" stroke-width="1"/>
       <text x="60" y="57" text-anchor="middle" font-size="14" font-weight="700" fill="{text_primary}">NP</text>"""
 
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 590" width="100%" height="100%">
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
   <defs>
     <style>
       text {{
@@ -352,8 +363,8 @@ def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
     </pattern>
   </defs>
 
-  <rect width="800" height="590" fill="{bg}"/>
-  <rect width="800" height="590" fill="url(#grid_wide_{theme})"/>
+  <rect width="800" height="600" fill="{bg}"/>
+  <rect width="800" height="600" fill="url(#grid_wide_{theme})"/>
 
   <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
@@ -374,6 +385,7 @@ def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
   <g class="fade-in delay-1">
     <rect x="24" y="98" width="752" height="58" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     <text x="40" y="118" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// MY STACK</text>
+    <text x="760" y="118" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Primary Languages</text>
 """
 
     tile_w = 112
@@ -400,33 +412,84 @@ def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
 
     svg += f"""  </g>
 
-  <!-- ==================== BENTO BLOCK 3: ENGINEERING METRICS ==================== -->
+  <!-- ==================== BENTO BLOCK 3: PLATFORMS & PROJECT SCOPE ==================== -->
   <g class="fade-in delay-2">
-    <rect x="24" y="166" width="752" height="78" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="24" y="166" width="752" height="88" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="40" y="186" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ENGINEERING METRICS</text>
-    <text x="760" y="186" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Linux &amp; macOS // x86_64 &amp; ARM64</text>
+    <text x="40" y="186" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// PLATFORMS &amp; PROJECT SCOPE</text>
+    <text x="760" y="186" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Linux · macOS · Web // Drivers · UI · Systems</text>
     <line x1="40" y1="194" x2="760" y2="194" stroke="{border_subtle}" stroke-width="1"/>
 
-    <!-- Stat 1: Repositories -->
-    <text x="40" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">REPOSITORIES</text>
-    <text x="40" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_repos}</text>
+    <!-- Column 1: Target Platforms -->
+    <text x="40" y="209" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">TARGET PLATFORMS</text>
+"""
 
-    <!-- Stat 2: Contributions -->
-    <text x="280" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">YEARLY CONTRIBUTIONS</text>
-    <text x="280" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_contribs}</text>
+    chip_w = 104
+    chip_h = 30
+    chip_gap = 8
+    chip_start_x = 40
+    chip_y = 215
 
-    <!-- Stat 3: Weekly Peak -->
-    <text x="530" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">WEEKLY ACTIVITY PEAK</text>
-    <text x="530" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{max_week} <tspan font-size="11" font-weight="400" fill="{text_secondary}">commits / wk</tspan></text>
-  </g>
+    for idx, p in enumerate(platforms):
+        px = chip_start_x + idx * (chip_w + chip_gap)
+        p_name = xesc(p.get("name", "").upper())
+        p_badge = xesc(p.get("badge", ""))
+        svg += f"""    <!-- Platform Chip: {p_name} -->
+    <g transform="translate({px}, {chip_y})">
+      <rect width="{chip_w}" height="{chip_h}" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
+      <rect x="8" y="6" width="4" height="4" fill="{accent}"/>
+      <text x="17" y="11" font-size="9.5" font-weight="700" letter-spacing="0.04em" fill="{text_primary}">[ {p_name} ]</text>
+      <text x="8" y="23" font-size="8" font-weight="500" fill="{text_tertiary}">{p_badge}</text>
+    </g>
+"""
+
+    pie_svg = generate_pie_chart_svg(432, 232, 20, project_scopes, is_dark, card_bg, border)
+
+    svg += f"""    <!-- Column Divider -->
+    <line x1="385" y1="202" x2="385" y2="246" stroke="{border_subtle}" stroke-width="1"/>
+
+    <!-- Column 2: Preferred Project Scope & Pie Chart -->
+    <text x="405" y="209" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">PREFERRED PROJECT SCOPE</text>
+
+    <!-- Pizza Graphics (Pie Chart) -->
+    <g>
+{pie_svg}
+    </g>
+"""
+
+    legend_colors = ["#f3f4f6", "#9ca3af", "#4b5563"] if is_dark else ["#1e293b", "#64748b", "#cbd5e1"]
+    legend_text_colors = [text_primary, text_secondary, text_tertiary]
+    legend_ys = [222, 234, 246]
+
+    for idx, s in enumerate(project_scopes):
+        if idx >= len(legend_ys):
+            break
+        ly = legend_ys[idx]
+        s_name = xesc(s.get("name", ""))
+        s_pct = s.get("pct", 0)
+        swatch_c = legend_colors[idx % len(legend_colors)]
+        t_color = legend_text_colors[idx % len(legend_text_colors)]
+
+        leader_start = max(615, int(482 + len(s_name) * 6.2 + 8))
+        leader_line = f'<line x1="{leader_start}" y1="{ly - 3}" x2="732" y2="{ly - 3}" stroke="{border_subtle}" stroke-dasharray="2,3" stroke-width="0.75"/>' if leader_start < 730 else ''
+
+        svg += f"""    <!-- Scope Item: {s_name} -->
+    <g>
+      <rect x="468" y="{ly - 7}" width="7" height="7" fill="{swatch_c}"/>
+      <text x="482" y="{ly}" font-size="9" font-weight="600" fill="{t_color}">{s_name}</text>
+      {leader_line}
+      <text x="760" y="{ly}" text-anchor="end" font-size="9.5" font-weight="700" fill="{t_color}" class="tabular">{s_pct}%</text>
+    </g>
+"""
+
+    svg += f"""  </g>
 
   <!-- ==================== BENTO BLOCK 4: ACTIVITY RHYTHM ==================== -->
   <g class="fade-in delay-3">
-    <rect x="24" y="254" width="752" height="116" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="24" y="264" width="752" height="116" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="40" y="274" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ACTIVITY RHYTHM</text>
-    <text x="760" y="274" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">52-Week Oscilloscope</text>
+    <text x="40" y="284" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ACTIVITY RHYTHM</text>
+    <text x="760" y="284" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">52-Week Oscilloscope</text>
 
     <!-- Guide Lines -->
     <line x1="42" y1="{wave_y_base}" x2="{wave_x + wave_w}" y2="{wave_y_base}" stroke="{border_subtle}" stroke-width="1"/>
@@ -447,24 +510,24 @@ def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
 
     <!-- Timeline Labels -->
     <g font-size="9" font-weight="500" fill="{text_tertiary}">
-      <text x="{wave_x}" y="356">W01</text>
-      <text x="{wave_x + wave_w*0.25:.1f}" y="356" text-anchor="middle">W13</text>
-      <text x="{wave_x + wave_w*0.5:.1f}" y="356" text-anchor="middle">W26</text>
-      <text x="{wave_x + wave_w*0.75:.1f}" y="356" text-anchor="middle">W39</text>
-      <text x="{wave_x + wave_w}" y="356" text-anchor="end">W52</text>
+      <text x="{wave_x}" y="366">W01</text>
+      <text x="{wave_x + wave_w*0.25:.1f}" y="366" text-anchor="middle">W13</text>
+      <text x="{wave_x + wave_w*0.5:.1f}" y="366" text-anchor="middle">W26</text>
+      <text x="{wave_x + wave_w*0.75:.1f}" y="366" text-anchor="middle">W39</text>
+      <text x="{wave_x + wave_w}" y="366" text-anchor="end">W52</text>
     </g>
   </g>
 
   <!-- ==================== BENTO BLOCK 5: FEATURED PROJECTS ==================== -->
   <g class="fade-in delay-4">
-    <rect x="24" y="380" width="752" height="164" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="24" y="390" width="752" height="164" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="40" y="400" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// FEATURED PROJECTS</text>
-    <text x="760" y="400" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Open Source Systems &amp; Tools</text>
-    <line x1="40" y1="408" x2="760" y2="408" stroke="{border_subtle}" stroke-width="1"/>
+    <text x="40" y="410" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// FEATURED PROJECTS</text>
+    <text x="760" y="410" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Open Source Systems &amp; Tools</text>
+    <line x1="40" y1="418" x2="760" y2="418" stroke="{border_subtle}" stroke-width="1"/>
 """
 
-    row_ys = [416, 448, 480, 512]
+    row_ys = [426, 458, 490, 522]
 
     for idx, repo in enumerate(featured):
         if idx >= len(row_ys):
@@ -499,10 +562,10 @@ def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
 
   <!-- ==================== FOOTER ==================== -->
   <g class="fade-in delay-4">
-    <line x1="24" y1="556" x2="776" y2="556" stroke="{border}" stroke-width="1"/>
+    <line x1="24" y1="566" x2="776" y2="566" stroke="{border}" stroke-width="1"/>
     
-    <text x="28" y="572" font-size="9.5" font-weight="400" fill="{text_tertiary}">{affiliation} · {location} · {employment_status}</text>
-    <text x="772" y="572" text-anchor="end" font-size="9.5" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
+    <text x="28" y="582" font-size="9.5" font-weight="400" fill="{text_tertiary}">{affiliation} · {location} · {employment_status}</text>
+    <text x="772" y="582" text-anchor="end" font-size="9.5" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
   </g>
 </svg>
 """
@@ -541,9 +604,7 @@ def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=
         accent_stroke = "#1e293b"
         accent_fill_opacity = 0.08
 
-    total_repos = data.get("repositories", {}).get("totalCount", 30)
     cal = data.get("contributionsCollection", {}).get("contributionCalendar", {})
-    total_contribs = cal.get("totalContributions", 963)
     weeks = cal.get("weeks", [])
     
     weekly_counts = []
@@ -561,8 +622,8 @@ def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=
 
     wave_x = 28
     wave_w = 344
-    wave_y_base = 394
-    wave_y_top = 346
+    wave_y_base = 414
+    wave_y_top = 366
     wave_h = wave_y_base - wave_y_top
 
     points = []
@@ -591,6 +652,20 @@ def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=
         {"name": "Assembly", "slug": "assemblyscript"}
     ])[:6]
 
+    # Target Platforms
+    platforms = config.get("platforms", [
+        {"name": "Linux", "badge": "Kernel · Drivers"},
+        {"name": "macOS", "badge": "Darwin · Systems"},
+        {"name": "Web", "badge": "Wasm · Modern UI"}
+    ])[:3]
+
+    # Project Scope Breakdown for Pie Chart
+    project_scopes = config.get("project_scopes", [
+        {"name": "Drivers & Low-Level", "pct": 45},
+        {"name": "User Interface / GUI", "pct": 35},
+        {"name": "Systems & Daemons", "pct": 20}
+    ])[:3]
+
     featured = config.get("featured_repos", [])[:4]
     
     raw_name = config.get("name", "Nilton Perim Neto")
@@ -603,13 +678,13 @@ def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=
     employment_status = xesc(emp_status_raw)
 
     if avatar_data_uri:
-        avatar_svg = f"""      <image href="{avatar_data_uri}" x="28" y="28" width="44" height="44" preserveAspectRatio="xMidYMid slice"/>
-      <rect x="28" y="28" width="44" height="44" fill="none" stroke="{border}" stroke-width="1"/>"""
+        avatar_svg = f"""      <image href="{avatar_data_uri}" x="28" y="24" width="42" height="42" preserveAspectRatio="xMidYMid slice"/>
+      <rect x="28" y="24" width="42" height="42" fill="none" stroke="{border}" stroke-width="1"/>"""
     else:
-        avatar_svg = f"""      <rect x="28" y="28" width="44" height="44" fill="{inner_bg}" stroke="{border}" stroke-width="1"/>
-      <text x="50" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="{text_primary}">NP</text>"""
+        avatar_svg = f"""      <rect x="28" y="24" width="42" height="42" fill="{inner_bg}" stroke="{border}" stroke-width="1"/>
+      <text x="49" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="{text_primary}">NP</text>"""
 
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 660" width="100%" height="100%">
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 680" width="100%" height="100%">
   <defs>
     <style>
       text {{
@@ -663,17 +738,17 @@ def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=
       <stop offset="100%" stop-color="{accent}" stop-opacity="0.0"/>
     </linearGradient>
 
-    <pattern id="grid_portrait_{theme}" width="20" height="20" patternUnits="userSpaceOnUse">
-      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="{border_subtle}" stroke-width="0.5" opacity="0.35"/>
+    <pattern id="grid_portrait_{theme}" width="16" height="16" patternUnits="userSpaceOnUse">
+      <path d="M 16 0 L 0 0 0 16" fill="none" stroke="{border_subtle}" stroke-width="0.5" opacity="0.3"/>
     </pattern>
   </defs>
 
-  <rect width="400" height="660" fill="{bg}"/>
-  <rect width="400" height="660" fill="url(#grid_portrait_{theme})"/>
+  <rect width="400" height="680" fill="{bg}"/>
+  <rect width="400" height="680" fill="url(#grid_portrait_{theme})"/>
 
   <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
-    <rect x="16" y="16" width="368" height="94" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="16" y="14" width="368" height="94" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
 {avatar_svg}
 
@@ -719,35 +794,79 @@ def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=
     </g>
 """
 
+    pie_svg = generate_pie_chart_svg(196, 284, 16, project_scopes, is_dark, card_bg, border)
+
     svg += f"""  </g>
 
-  <!-- ==================== BENTO BLOCK 3: ENGINEERING METRICS ==================== -->
+  <!-- ==================== BENTO BLOCK 3: PLATFORMS & PROJECT SCOPE ==================== -->
   <g class="fade-in delay-2">
-    <rect x="16" y="222" width="368" height="76" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="16" y="222" width="368" height="96" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="28" y="239" font-size="9" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ENGINEERING METRICS</text>
-    <text x="372" y="239" text-anchor="end" font-size="8.5" font-weight="500" fill="{text_tertiary}">Linux &amp; macOS</text>
+    <text x="28" y="239" font-size="9" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// PLATFORMS &amp; PROJECT SCOPE</text>
+    <text x="372" y="239" text-anchor="end" font-size="8.5" font-weight="500" fill="{text_tertiary}">Linux · macOS · Web</text>
     <line x1="28" y1="246" x2="372" y2="246" stroke="{border_subtle}" stroke-width="0.75"/>
 
-    <!-- Stat 1: Repositories -->
-    <text x="28" y="263" font-size="8" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">REPOSITORIES</text>
-    <text x="28" y="285" font-size="19" font-weight="600" fill="{text_primary}" class="tabular">{total_repos}</text>
+    <!-- Column 1: Target Platforms -->
+    <text x="28" y="259" font-size="8" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">TARGET PLATFORMS</text>
+"""
 
-    <!-- Stat 2: Contributions -->
-    <text x="145" y="263" font-size="8" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">CONTRIBUTIONS</text>
-    <text x="145" y="285" font-size="19" font-weight="600" fill="{text_primary}" class="tabular">{total_contribs}</text>
+    chip_start_y = 265
+    chip_h = 14
+    for idx, p in enumerate(platforms):
+        cy = chip_start_y + idx * 17
+        p_name = xesc(p.get("name", "").upper())
+        p_badge = xesc(p.get("badge", "").split("·")[0].strip())
+        svg += f"""    <!-- Platform Chip: {p_name} -->
+    <g transform="translate(28, {cy})">
+      <rect width="130" height="{chip_h}" fill="{inner_bg}" stroke="{border}" stroke-width="0.6"/>
+      <rect x="5" y="5" width="4" height="4" fill="{accent}"/>
+      <text x="14" y="10.5" font-size="8" font-weight="700" letter-spacing="0.03em" fill="{text_primary}">[ {p_name} ]</text>
+      <text x="124" y="10.5" text-anchor="end" font-size="7.5" font-weight="500" fill="{text_tertiary}">{p_badge}</text>
+    </g>
+"""
 
-    <!-- Stat 3: Weekly Peak -->
-    <text x="262" y="263" font-size="8" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">WEEKLY PEAK</text>
-    <text x="262" y="285" font-size="19" font-weight="600" fill="{text_primary}" class="tabular">{max_week} <tspan font-size="9.5" font-weight="400" fill="{text_secondary}">/wk</tspan></text>
-  </g>
+    svg += f"""    <!-- Column Divider -->
+    <line x1="168" y1="252" x2="168" y2="312" stroke="{border_subtle}" stroke-width="0.75"/>
+
+    <!-- Column 2: Preferred Project Scope & Pie Chart -->
+    <text x="180" y="259" font-size="8" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">PROJECT SCOPE</text>
+
+    <!-- Pizza Graphics (Pie Chart) -->
+    <g>
+{pie_svg}
+    </g>
+"""
+
+    legend_colors = ["#f3f4f6", "#9ca3af", "#4b5563"] if is_dark else ["#1e293b", "#64748b", "#cbd5e1"]
+    legend_text_colors = [text_primary, text_secondary, text_tertiary]
+    short_names = ["Drivers", "UI / GUI", "Systems"]
+    legend_ys = [272, 286, 300]
+
+    for idx, s in enumerate(project_scopes):
+        if idx >= len(legend_ys):
+            break
+        ly = legend_ys[idx]
+        s_name = xesc(short_names[idx] if idx < len(short_names) else s.get("name", ""))
+        s_pct = s.get("pct", 0)
+        swatch_c = legend_colors[idx % len(legend_colors)]
+        t_color = legend_text_colors[idx % len(legend_text_colors)]
+
+        svg += f"""    <!-- Scope Item: {s_name} -->
+    <g>
+      <rect x="222" y="{ly - 6}" width="6" height="6" fill="{swatch_c}"/>
+      <text x="232" y="{ly}" font-size="8" font-weight="600" fill="{t_color}">{s_name}</text>
+      <text x="372" y="{ly}" text-anchor="end" font-size="8.5" font-weight="700" fill="{t_color}" class="tabular">{s_pct}%</text>
+    </g>
+"""
+
+    svg += f"""  </g>
 
   <!-- ==================== BENTO BLOCK 4: ACTIVITY RHYTHM ==================== -->
   <g class="fade-in delay-3">
-    <rect x="16" y="308" width="368" height="114" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="16" y="328" width="368" height="114" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="28" y="325" font-size="9" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ACTIVITY RHYTHM</text>
-    <text x="372" y="325" text-anchor="end" font-size="8.5" font-weight="500" fill="{text_tertiary}">52-Week Rhythm</text>
+    <text x="28" y="345" font-size="9" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ACTIVITY RHYTHM</text>
+    <text x="372" y="345" text-anchor="end" font-size="8.5" font-weight="500" fill="{text_tertiary}">52-Week Rhythm</text>
 
     <!-- Guide Lines -->
     <line x1="{wave_x}" y1="{wave_y_base}" x2="{wave_x + wave_w}" y2="{wave_y_base}" stroke="{border_subtle}" stroke-width="1"/>
@@ -768,24 +887,24 @@ def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=
 
     <!-- Timeline Labels -->
     <g font-size="8.5" font-weight="500" fill="{text_tertiary}">
-      <text x="{wave_x}" y="409">W01</text>
-      <text x="{wave_x + wave_w*0.25:.1f}" y="409" text-anchor="middle">W13</text>
-      <text x="{wave_x + wave_w*0.5:.1f}" y="409" text-anchor="middle">W26</text>
-      <text x="{wave_x + wave_w*0.75:.1f}" y="409" text-anchor="middle">W39</text>
-      <text x="{wave_x + wave_w}" y="409" text-anchor="end">W52</text>
+      <text x="{wave_x}" y="429">W01</text>
+      <text x="{wave_x + wave_w*0.25:.1f}" y="429" text-anchor="middle">W13</text>
+      <text x="{wave_x + wave_w*0.5:.1f}" y="429" text-anchor="middle">W26</text>
+      <text x="{wave_x + wave_w*0.75:.1f}" y="429" text-anchor="middle">W39</text>
+      <text x="{wave_x + wave_w}" y="429" text-anchor="end">W52</text>
     </g>
   </g>
 
   <!-- ==================== BENTO BLOCK 5: FEATURED PROJECTS ==================== -->
   <g class="fade-in delay-4">
-    <rect x="16" y="432" width="368" height="180" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="16" y="452" width="368" height="180" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="28" y="449" font-size="9" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// FEATURED PROJECTS</text>
-    <text x="372" y="449" text-anchor="end" font-size="8.5" font-weight="500" fill="{text_tertiary}">Open Source</text>
-    <line x1="28" y1="456" x2="372" y2="456" stroke="{border_subtle}" stroke-width="0.75"/>
+    <text x="28" y="469" font-size="9" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// FEATURED PROJECTS</text>
+    <text x="372" y="469" text-anchor="end" font-size="8.5" font-weight="500" fill="{text_tertiary}">Open Source</text>
+    <line x1="28" y1="476" x2="372" y2="476" stroke="{border_subtle}" stroke-width="0.75"/>
 """
 
-    row_ys = [461, 497, 533, 569]
+    row_ys = [481, 517, 553, 589]
 
     for idx, repo in enumerate(featured):
         if idx >= len(row_ys):
@@ -824,11 +943,11 @@ def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=
 
   <!-- ==================== FOOTER ==================== -->
   <g class="fade-in delay-4">
-    <line x1="16" y1="622" x2="384" y2="622" stroke="{border}" stroke-width="0.75"/>
+    <line x1="16" y1="642" x2="384" y2="642" stroke="{border}" stroke-width="0.75"/>
     
-    <text x="20" y="635" font-size="8" font-weight="400" fill="{text_tertiary}">{affiliation} · {location}</text>
-    <text x="20" y="647" font-size="7.5" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
-    <text x="380" y="647" text-anchor="end" font-size="7.5" font-weight="500" fill="{text_tertiary}">HUD v2.4</text>
+    <text x="20" y="655" font-size="8" font-weight="400" fill="{text_tertiary}">{affiliation} · {location}</text>
+    <text x="20" y="667" font-size="7.5" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
+    <text x="380" y="667" text-anchor="end" font-size="7.5" font-weight="500" fill="{text_tertiary}">HUD v2.4</text>
   </g>
 </svg>
 """
