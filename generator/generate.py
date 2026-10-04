@@ -7,10 +7,16 @@ import sys
 import urllib.request
 import urllib.error
 from datetime import datetime
+from html import escape as xml_escape
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT_DIR, "config.json")
 ASSETS_DIR = os.path.join(ROOT_DIR, "assets")
+
+def xesc(val):
+    if val is None:
+        return ""
+    return xml_escape(str(val), quote=True)
 
 def load_config():
     if os.path.exists(CONFIG_PATH):
@@ -103,6 +109,11 @@ def fetch_github_data(username):
     }
 
 def generate_svg(theme="dark", data=None, config=None):
+    if config is None:
+        config = {}
+    if data is None:
+        data = {}
+
     is_dark = (theme == "dark")
     
     if is_dark:
@@ -191,12 +202,18 @@ def generate_svg(theme="dark", data=None, config=None):
     lang_rects = []
     curr_x = lang_bar_x
     for lang in langs:
-        w_part = (lang["pct"] / 100.0) * lang_bar_w
-        lang_rects.append((lang["name"], lang["pct"], curr_x, w_part))
+        w_part = (lang.get("pct", 0) / 100.0) * lang_bar_w
+        lang_rects.append((lang.get("name", ""), lang.get("pct", 0), curr_x, w_part))
         curr_x += w_part
 
     featured = config.get("featured_repos", [])[:4]
     now_str = datetime.utcnow().strftime("%Y.%m.%d // %H:%M UTC")
+
+    display_name = xesc(config.get("name", "NILTON PERIM NETO"))
+    tagline = xesc(config.get("tagline", "Not a Programmer, just a historian."))
+    system_env = xesc(config.get("system_env", "x86_64 // ARM64 // Linux & macOS"))
+    location = xesc(config.get("location", "Goiás, Brazil"))
+    coordinates = xesc(config.get("coordinates", "-16.68° S, -49.26° W"))
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 370" width="100%" height="100%">
   <defs>
@@ -288,8 +305,8 @@ def generate_svg(theme="dark", data=None, config=None):
   <!-- ==================== HEADER ==================== -->
   <g class="fade-in">
     <line x1="24" y1="46" x2="826" y2="46" stroke="{border}" stroke-width="1"/>
-    <text x="28" y="32" font-size="11.5" font-weight="700" fill="{accent}">[ 01 // NILTON PERIM NETO ]</text>
-    <text x="245" y="32" font-size="10" font-weight="400" fill="{text_secondary}">{config.get('tagline', 'Not a Programmer, just a historian.')}</text>
+    <text x="28" y="32" font-size="11.5" font-weight="700" fill="{accent}">[ 01 // {display_name} ]</text>
+    <text x="245" y="32" font-size="10" font-weight="400" fill="{text_secondary}">{tagline}</text>
     
     <rect x="674" y="20" width="152" height="18" fill="{subpanel_bg}" stroke="{border_light}" stroke-width="0.8" rx="2"/>
     <circle cx="686" cy="29" r="3" fill="{accent}"/>
@@ -325,14 +342,18 @@ def generate_svg(theme="dark", data=None, config=None):
 """
 
     for name, pct, lx, lw in lang_rects:
-        svg += f"""    <rect x="{lx}" y="181" width="{lw - 1:.1f}" height="4" fill="{text_primary}" opacity="0.85"/>\n"""
+        svg += f"""    <rect x="{lx}" y="181" width="{max(0, lw - 1):.1f}" height="4" fill="{text_primary}" opacity="0.85"/>\n"""
+
+    lang_labels = ""
+    lang_x_positions = [46, 145, 235, 325]
+    for idx, lang in enumerate(langs[:4]):
+        lx = lang_x_positions[idx] if idx < len(lang_x_positions) else 46 + idx * 90
+        lname = xesc(lang.get("name", "").upper())
+        lpct = lang.get("pct", 0)
+        lang_labels += f'      <text x="{lx}" y="198">{lname} {lpct}%</text>\n'
 
     svg += f"""    <g font-size="8.5" fill="{text_secondary}">
-      <text x="46" y="198">RUST 42%</text>
-      <text x="145" y="198">TS 28%</text>
-      <text x="235" y="198">PYTHON 18%</text>
-      <text x="325" y="198">C/ASM 12%</text>
-    </g>
+{lang_labels}    </g>
   </g>
 
   <!-- ==================== OSCILLOSCOPE ==================== -->
@@ -397,15 +418,16 @@ def generate_svg(theme="dark", data=None, config=None):
 
     for idx, repo in enumerate(featured):
         bx, by, bw = card_coords[idx]
-        r_name = repo.get("name", "").upper()
-        r_desc = repo.get("desc", "")
-        r_stack = repo.get("stack", "")
+        r_name = xesc(repo.get("name", "").upper())
+        r_desc_raw = repo.get("desc", "")
+        if len(r_desc_raw) > 34:
+            r_desc_raw = r_desc_raw[:31] + "..."
+        r_desc = xesc(r_desc_raw)
+        r_stack = xesc(repo.get("stack", ""))
         r_stars = repo.get("stars", 0)
 
-        if len(r_desc) > 34:
-            r_desc = r_desc[:31] + "..."
-
         star_str = f"★ {r_stars}" if r_stars > 0 else ""
+        star_str = xesc(star_str)
 
         svg += f"""    <g transform="translate({bx}, {by})">
       <text x="0" y="16" font-size="10.5" font-weight="700" fill="{text_primary}">[{idx + 1:02d}] {r_name}</text>
@@ -422,8 +444,8 @@ def generate_svg(theme="dark", data=None, config=None):
   <g class="fade-in delay-3" font-size="8.5" fill="{text_dim}">
     <line x1="24" y1="334" x2="826" y2="334" stroke="{border}" stroke-width="0.8"/>
     
-    <text x="28" y="348">ENV: {config.get('system_env', 'x86_64 // ARM64 // Linux & macOS')}</text>
-    <text x="425" y="348" text-anchor="middle">LOC: {config.get('location', 'Goiás, Brazil')} ({config.get('coordinates', '-16.68° S, -49.26° W')})</text>
+    <text x="28" y="348">ENV: {system_env}</text>
+    <text x="425" y="348" text-anchor="middle">LOC: {location} ({coordinates})</text>
     <text x="822" y="348" text-anchor="end">SYS.SYNC: {now_str} <tspan class="cursor" fill="{accent}">█</tspan></text>
   </g>
 </svg>
