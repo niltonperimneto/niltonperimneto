@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import urllib.request
+import base64
 import html
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,6 +32,20 @@ LANGUAGE_ICONS = {
     "assemblyscript": "M12 0L1.5 6v12L12 24l10.5-6V6L12 0zm0 3.27l7.5 4.29v8.88L12 20.73l-7.5-4.29V7.56L12 3.27z M12 6.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm0 2a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7z"
 }
 
+def fetch_avatar_data_uri(avatar_url):
+    if not avatar_url:
+        return ""
+    try:
+        req = urllib.request.Request(avatar_url, headers={"User-Agent": "ProfileGenerator/1.0"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = resp.read()
+            mime = resp.headers.get_content_type()
+            b64 = base64.b64encode(data).decode("utf-8")
+            return f"data:{mime};base64,{b64}"
+    except Exception as e:
+        print(f"Warning: Failed to fetch avatar: {e}")
+        return ""
+
 def fetch_github_data(username):
     query = """
     query {
@@ -39,6 +54,7 @@ def fetch_github_data(username):
         name
         bio
         location
+        avatarUrl
         repositories(first: 100, ownerAffiliations: OWNER, isFork: false) {
           totalCount
           nodes {
@@ -102,6 +118,7 @@ def fetch_github_data(username):
         "name": "Nilton Perim Neto",
         "bio": "Not a Programmer, just a historian.",
         "location": "Goiás, Brazil",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/118851240?v=4",
         "repositories": { "totalCount": 30, "nodes": [] },
         "contributionsCollection": {
             "contributionCalendar": {
@@ -111,7 +128,7 @@ def fetch_github_data(username):
         }
     }
 
-def generate_svg(theme="dark", data=None, config=None):
+def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
     if config is None:
         config = {}
     if data is None:
@@ -162,11 +179,11 @@ def generate_svg(theme="dark", data=None, config=None):
     max_week = max(weekly_counts) if weekly_counts and max(weekly_counts) > 0 else 1
     peak_idx = weekly_counts.index(max_week) if weekly_counts else 0
 
-    # Activity chart dimensions inside right panel
-    wave_x = 386
-    wave_w = 370
-    wave_y_base = 250
-    wave_y_top = 186
+    # Full-width Activity chart dimensions
+    wave_x = 42
+    wave_w = 716
+    wave_y_base = 340
+    wave_y_top = 286
     wave_h = wave_y_base - wave_y_top
 
     points = []
@@ -208,11 +225,19 @@ def generate_svg(theme="dark", data=None, config=None):
     # Employment Status: Unemployed / Seeking Employment
     emp_status_raw = config.get("employment_status", "Seeking Employment · Open to Work")
     employment_status = xesc(emp_status_raw)
-    badge_w = max(215, len(emp_status_raw) * 6.6 + 34)
-    badge_x = 776 - badge_w
+    badge_w = max(215, len(emp_status_raw) * 6.5 + 34)
+    badge_x = 776 - badge_w - 12
 
-    # SVG Construction - strictly sharp angles (no rx / ry, no circles), responsive viewbox 800 x 472
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 472" width="100%" height="100%">
+    # Avatar image embedding or monogram fallback
+    if avatar_data_uri:
+        avatar_svg = f"""      <image href="{avatar_data_uri}" x="36" y="32" width="44" height="44" preserveAspectRatio="xMidYMid slice"/>
+      <rect x="36" y="32" width="44" height="44" fill="none" stroke="{border}" stroke-width="1"/>"""
+    else:
+        avatar_svg = f"""      <rect x="36" y="32" width="44" height="44" fill="{inner_bg}" stroke="{border}" stroke-width="1"/>
+      <text x="58" y="59" text-anchor="middle" font-size="14" font-weight="700" fill="{text_primary}">NP</text>"""
+
+    # Single Bento Block at a time (Full width stacked, strictly sharp angles, strictly monochrome)
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 604" width="100%" height="100%">
   <defs>
     <style>
       text {{
@@ -225,8 +250,8 @@ def generate_svg(theme="dark", data=None, config=None):
       }}
 
       .draw-stroke {{
-        stroke-dasharray: 2000;
-        stroke-dashoffset: 2000;
+        stroke-dasharray: 3000;
+        stroke-dashoffset: 3000;
         animation: drawPath 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }}
 
@@ -235,9 +260,10 @@ def generate_svg(theme="dark", data=None, config=None):
         animation: fadeIn 0.5s ease forwards;
       }}
 
-      .delay-1 {{ animation-delay: 0.1s; }}
-      .delay-2 {{ animation-delay: 0.2s; }}
-      .delay-3 {{ animation-delay: 0.3s; }}
+      .delay-1 {{ animation-delay: 0.08s; }}
+      .delay-2 {{ animation-delay: 0.16s; }}
+      .delay-3 {{ animation-delay: 0.24s; }}
+      .delay-4 {{ animation-delay: 0.32s; }}
 
       .pulse-marker {{
         animation: pulse 2.4s infinite ease-in-out;
@@ -257,12 +283,6 @@ def generate_svg(theme="dark", data=None, config=None):
         0%, 100% {{ transform: scale(1); opacity: 1; }}
         50% {{ transform: scale(2.2); opacity: 0.25; }}
       }}
-
-      /* Responsive adaptations */
-      @media (max-width: 600px) {{
-        .stat-label {{ font-size: 10px !important; font-weight: 700 !important; }}
-        .header-title {{ font-size: 17px !important; }}
-      }}
     </style>
 
     <linearGradient id="curveGrad_{theme}" x1="0" y1="0" x2="0" y2="1">
@@ -271,43 +291,41 @@ def generate_svg(theme="dark", data=None, config=None):
     </linearGradient>
   </defs>
 
-  <!-- Card Background (Sharp Angles) -->
-  <rect width="800" height="472" fill="{bg}"/>
-  <rect x="0.5" y="0.5" width="799" height="471" fill="none" stroke="{border}" stroke-width="1"/>
+  <!-- Canvas Background -->
+  <rect width="800" height="604" fill="{bg}"/>
+  <rect x="0.5" y="0.5" width="799" height="603" fill="none" stroke="{border}" stroke-width="1"/>
 
-  <!-- ==================== HEADER ==================== -->
+  <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
-    <!-- Monogram Square -->
-    <rect x="24" y="22" width="34" height="34" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
-    <text x="41" y="44" text-anchor="middle" font-size="12.5" font-weight="700" fill="{text_primary}">NP</text>
+    <rect x="24" y="20" width="752" height="68" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    
+    <!-- Profile Picture (GitHub Avatar) -->
+{avatar_svg}
 
     <!-- Name & Tagline -->
-    <text class="header-title" x="68" y="36" font-size="16" font-weight="600" fill="{text_primary}" letter-spacing="-0.01em">{display_name}</text>
-    <text x="68" y="51" font-size="11.5" font-weight="400" fill="{text_secondary}">{tagline}</text>
+    <text x="94" y="49" font-size="16" font-weight="600" fill="{text_primary}" letter-spacing="-0.01em">{display_name}</text>
+    <text x="94" y="67" font-size="11" font-weight="400" fill="{text_secondary}">{tagline}</text>
 
-    <!-- Employment Status Badge (Sharp Box) -->
-    <rect x="{badge_x:.1f}" y="24" width="{badge_w:.1f}" height="30" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
-    <rect x="{badge_x + 12:.1f}" y="35" width="7" height="7" fill="{text_primary}"/>
-    <text x="{badge_x + 28:.1f}" y="{43}" font-size="11" font-weight="600" fill="{text_primary}">{employment_status}</text>
-
-    <!-- Header Divider -->
-    <line x1="24" y1="68" x2="776" y2="68" stroke="{border}" stroke-width="1"/>
+    <!-- Employment Status Badge -->
+    <rect x="{badge_x:.1f}" y="40" width="{badge_w:.1f}" height="28" fill="{inner_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="{badge_x + 10:.1f}" y="50" width="7" height="7" fill="{text_primary}"/>
+    <text x="{badge_x + 24:.1f}" y="58" font-size="10.5" font-weight="600" fill="{text_primary}">{employment_status}</text>
   </g>
 
-  <!-- ==================== MY STACK (TOP BANNER) ==================== -->
+  <!-- ==================== BENTO BLOCK 2: MY STACK ==================== -->
   <g class="fade-in delay-1">
-    <rect x="24" y="80" width="752" height="46" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
-    <text x="40" y="108" font-size="10.5" font-weight="600" letter-spacing="0.05em" fill="{text_secondary}">MY STACK</text>
+    <rect x="24" y="98" width="752" height="58" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <text x="40" y="118" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// MY STACK</text>
 """
 
-    tile_w = 98
-    tile_h = 28
-    tile_start_x = 136
+    tile_w = 112
+    tile_h = 26
+    tile_start_x = 40
     tile_gap = 9
 
     for idx, lang in enumerate(stack_langs):
         tx = tile_start_x + idx * (tile_w + tile_gap)
-        ty = 89
+        ty = 122
         lname = xesc(lang.get("name", ""))
         lslug = lang.get("slug", "").lower()
         path_data = LANGUAGE_ICONS.get(lslug, LANGUAGE_ICONS.get("rust"))
@@ -315,46 +333,46 @@ def generate_svg(theme="dark", data=None, config=None):
         svg += f"""    <!-- {lname} Tile -->
     <g transform="translate({tx}, {ty})">
       <rect width="{tile_w}" height="{tile_h}" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
-      <g transform="translate(7, 5) scale(0.65)">
+      <g transform="translate(8, 4.5) scale(0.65)">
         <path d="{path_data}" fill="{text_secondary}"/>
       </g>
-      <text class="lang-text" x="28" y="18" font-size="10.5" font-weight="600" fill="{text_primary}">{lname}</text>
+      <text x="30" y="17" font-size="10.5" font-weight="600" fill="{text_primary}">{lname}</text>
     </g>
 """
 
     svg += f"""  </g>
 
-  <!-- ==================== METRICS & ACTIVITY ==================== -->
+  <!-- ==================== BENTO BLOCK 3: ENGINEERING METRICS ==================== -->
   <g class="fade-in delay-2">
-    <!-- Panel 1: Engineering Metrics -->
-    <rect x="24" y="138" width="330" height="148" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
-    <text x="42" y="162" font-size="10" font-weight="600" letter-spacing="0.05em" fill="{text_secondary}">ENGINEERING METRICS</text>
-    <line x1="42" y1="172" x2="334" y2="172" stroke="{border_subtle}" stroke-width="1"/>
+    <rect x="24" y="166" width="752" height="78" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    
+    <text x="40" y="186" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ENGINEERING METRICS</text>
+    <text x="760" y="186" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Linux &amp; macOS // x86_64 &amp; ARM64</text>
+    <line x1="40" y1="194" x2="760" y2="194" stroke="{border_subtle}" stroke-width="1"/>
 
     <!-- Stat 1: Repositories -->
-    <text class="stat-label" x="42" y="191" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">REPOSITORIES</text>
-    <text x="42" y="216" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_repos}</text>
+    <text x="40" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">REPOSITORIES</text>
+    <text x="40" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_repos}</text>
 
     <!-- Stat 2: Contributions -->
-    <text class="stat-label" x="142" y="191" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">YEARLY COMMITS</text>
-    <text x="142" y="216" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_contribs}</text>
+    <text x="280" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">YEARLY CONTRIBUTIONS</text>
+    <text x="280" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_contribs}</text>
 
-    <!-- Stat 3: Peak Activity -->
-    <text class="stat-label" x="246" y="191" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">WEEKLY PEAK</text>
-    <text x="246" y="216" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{max_week}</text>
+    <!-- Stat 3: Weekly Peak -->
+    <text x="530" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">WEEKLY ACTIVITY PEAK</text>
+    <text x="530" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{max_week} <tspan font-size="11" font-weight="400" fill="{text_secondary}">commits / wk</tspan></text>
+  </g>
 
-    <!-- Sub-info Focus Box -->
-    <rect x="42" y="234" width="292" height="34" fill="{inner_bg}" stroke="{border_subtle}" stroke-width="0.75"/>
-    <text x="52" y="255" font-size="10" font-weight="500" fill="{text_secondary}">Environment: Linux &amp; macOS · Systems Core</text>
-
-    <!-- Panel 2: Activity Rhythm -->
-    <rect x="366" y="138" width="410" height="148" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
-    <text x="386" y="162" font-size="10.5" font-weight="600" fill="{text_secondary}">Contribution Rhythm</text>
-    <text x="756" y="162" text-anchor="end" font-size="9.5" font-weight="500" fill="{text_tertiary}">52-Week Trajectory</text>
+  <!-- ==================== BENTO BLOCK 4: ACTIVITY RHYTHM ==================== -->
+  <g class="fade-in delay-3">
+    <rect x="24" y="254" width="752" height="116" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    
+    <text x="40" y="274" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ACTIVITY RHYTHM</text>
+    <text x="760" y="274" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">52-Week Oscilloscope</text>
 
     <!-- Guide Lines -->
-    <line x1="386" y1="{wave_y_base}" x2="{wave_x + wave_w}" y2="{wave_y_base}" stroke="{border_subtle}" stroke-width="1"/>
-    <line x1="386" y1="{wave_y_top + wave_h/2:.1f}" x2="{wave_x + wave_w}" y2="{wave_y_top + wave_h/2:.1f}" stroke="{border_subtle}" stroke-dasharray="3,4" stroke-width="0.75"/>
+    <line x1="42" y1="{wave_y_base}" x2="{wave_x + wave_w}" y2="{wave_y_base}" stroke="{border_subtle}" stroke-width="1"/>
+    <line x1="42" y1="{wave_y_top + wave_h/2:.1f}" x2="{wave_x + wave_w}" y2="{wave_y_top + wave_h/2:.1f}" stroke="{border_subtle}" stroke-dasharray="3,4" stroke-width="0.75"/>
 
     <!-- Gradient Fill -->
     <path d="{area_d}" fill="url(#curveGrad_{theme})"/>
@@ -370,69 +388,64 @@ def generate_svg(theme="dark", data=None, config=None):
     </g>
 
     <!-- Timeline Labels -->
-    <g font-size="9.5" font-weight="500" fill="{text_tertiary}">
-      <text x="{wave_x}" y="268">Q1</text>
-      <text x="{wave_x + wave_w*0.33:.1f}" y="268" text-anchor="middle">Q2</text>
-      <text x="{wave_x + wave_w*0.66:.1f}" y="268" text-anchor="middle">Q3</text>
-      <text x="{wave_x + wave_w}" y="268" text-anchor="end">Q4</text>
+    <g font-size="9" font-weight="500" fill="{text_tertiary}">
+      <text x="{wave_x}" y="356">W01</text>
+      <text x="{wave_x + wave_w*0.25:.1f}" y="356" text-anchor="middle">W13</text>
+      <text x="{wave_x + wave_w*0.5:.1f}" y="356" text-anchor="middle">W26</text>
+      <text x="{wave_x + wave_w*0.75:.1f}" y="356" text-anchor="middle">W39</text>
+      <text x="{wave_x + wave_w}" y="356" text-anchor="end">W52</text>
     </g>
   </g>
 
-  <!-- ==================== FEATURED PROJECTS (2x2 GRID) ==================== -->
-  <g class="fade-in delay-3">
+  <!-- ==================== BENTO BLOCK 5: FEATURED PROJECTS ==================== -->
+  <g class="fade-in delay-4">
+    <rect x="24" y="380" width="752" height="182" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    
+    <text x="40" y="400" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// FEATURED PROJECTS</text>
+    <text x="760" y="400" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Open Source Systems &amp; Tools</text>
+    <line x1="40" y1="408" x2="760" y2="408" stroke="{border_subtle}" stroke-width="1"/>
 """
 
-    card_coords = [
-        (24, 298, 369),
-        (407, 298, 369),
-        (24, 364, 369),
-        (407, 364, 369)
-    ]
+    row_ys = [416, 452, 488, 524]
 
     for idx, repo in enumerate(featured):
-        if idx >= len(card_coords):
+        if idx >= len(row_ys):
             break
-        bx, by, bw = card_coords[idx]
+        ry = row_ys[idx]
         r_name = xesc(repo.get("name", ""))
-        r_desc_raw = repo.get("desc", "")
-        if len(r_desc_raw) > 42:
-            r_desc_raw = r_desc_raw[:39] + "..."
-        r_desc = xesc(r_desc_raw)
+        r_desc = xesc(repo.get("desc", ""))
         r_stack = xesc(repo.get("stack", ""))
         r_stars = repo.get("stars", 0)
 
-        # Star badge (Sharp box)
-        star_svg = ""
-        if r_stars > 0:
-            star_str = f"★ {r_stars}"
-            star_w = 34 if r_stars < 10 else 40
-            star_svg = f"""<rect x="{bw - star_w - 12}" y="10" width="{star_w}" height="18" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
-      <text x="{bw - 12 - star_w/2}" y="22" text-anchor="middle" font-size="9" font-weight="600" fill="{text_secondary}">{star_str}</text>"""
-
-        # Stack tag width approx (Sharp box)
+        star_str = f"★ {r_stars}" if r_stars > 0 else ""
         tag_w = max(38, len(r_stack) * 5.8 + 12)
 
-        svg += f"""    <!-- Project Card {idx + 1} (Sharp Angles) -->
-    <g transform="translate({bx}, {by})">
-      <rect width="{bw}" height="56" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
-      <text class="repo-title" x="12" y="22" font-size="12.5" font-weight="600" fill="{text_primary}">{r_name}</text>
-      {star_svg}
-      <text x="12" y="41" font-size="10" font-weight="400" fill="{text_secondary}">{r_desc}</text>
+        # Subtle row divider
+        div_line = f"""<line x1="40" y1="{ry + 30}" x2="760" y2="{ry + 30}" stroke="{border_subtle}" stroke-width="0.75"/>""" if idx < 3 else ""
+
+        svg += f"""    <!-- Project Row {idx + 1} -->
+    <g>
+      <text x="40" y="{ry + 19}" font-size="12" font-weight="600" fill="{text_primary}">[{idx + 1:02d}] {r_name}</text>
+      <text x="180" y="{ry + 19}" font-size="10.5" font-weight="400" fill="{text_secondary}">{r_desc}</text>
       
-      <!-- Tech Badge (Sharp Box) -->
-      <rect x="{bw - tag_w - 12}" y="31" width="{tag_w}" height="17" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
-      <text x="{bw - 12 - tag_w/2}" y="43" text-anchor="middle" font-size="8.5" font-weight="500" fill="{text_tertiary}">{r_stack}</text>
+      <!-- Tech Badge -->
+      <rect x="{670 - tag_w}" y="{ry + 6}" width="{tag_w}" height="17" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
+      <text x="{670 - tag_w/2}" y="{ry + 18}" text-anchor="middle" font-size="8.5" font-weight="500" fill="{text_tertiary}">{r_stack}</text>
+      
+      <!-- Stars -->
+      <text x="756" y="{ry + 19}" text-anchor="end" font-size="9.5" font-weight="600" fill="{text_primary}">{star_str}</text>
+      {div_line}
     </g>
 """
 
     svg += f"""  </g>
 
   <!-- ==================== FOOTER ==================== -->
-  <g class="fade-in delay-3">
-    <line x1="24" y1="434" x2="776" y2="434" stroke="{border}" stroke-width="1"/>
+  <g class="fade-in delay-4">
+    <line x1="24" y1="574" x2="776" y2="574" stroke="{border}" stroke-width="1"/>
     
-    <text x="28" y="453" font-size="10" font-weight="400" fill="{text_tertiary}">{affiliation} · {location} · {employment_status}</text>
-    <text x="772" y="453" text-anchor="end" font-size="10" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
+    <text x="28" y="590" font-size="9.5" font-weight="400" fill="{text_tertiary}">{affiliation} · {location} · {employment_status}</text>
+    <text x="772" y="590" text-anchor="end" font-size="9.5" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
   </g>
 </svg>
 """
@@ -445,15 +458,19 @@ def main():
     print(f"Fetching GitHub data for {username}...")
     data = fetch_github_data(username)
     
+    avatar_url = data.get("avatarUrl", "https://avatars.githubusercontent.com/u/118851240?v=4")
+    print(f"Fetching avatar from {avatar_url}...")
+    avatar_data_uri = fetch_avatar_data_uri(avatar_url)
+    
     os.makedirs(ASSETS_DIR, exist_ok=True)
     
-    dark_svg = generate_svg(theme="dark", data=data, config=config)
+    dark_svg = generate_svg(theme="dark", data=data, config=config, avatar_data_uri=avatar_data_uri)
     dark_path = os.path.join(ASSETS_DIR, "zed-card-dark.svg")
     with open(dark_path, "w", encoding="utf-8") as f:
         f.write(dark_svg)
     print(f"Generated dark SVG: {dark_path}")
     
-    light_svg = generate_svg(theme="light", data=data, config=config)
+    light_svg = generate_svg(theme="light", data=data, config=config, avatar_data_uri=avatar_data_uri)
     light_path = os.path.join(ASSETS_DIR, "zed-card-light.svg")
     with open(light_path, "w", encoding="utf-8") as f:
         f.write(light_svg)
