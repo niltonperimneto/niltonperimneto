@@ -6,6 +6,14 @@
   "affiliation": "Universidade Federal de Goiás",
   "system_env": "x86_64 // ARM64 // Linux & macOS",
   "coordinates": "-16.6869° S, 49.2648° W",
+  "stack_languages": [
+    { "name": "Rust", "slug": "rust" },
+    { "name": "TypeScript", "slug": "typescript" },
+    { "name": "Python", "slug": "python" },
+    { "name": "C", "slug": "c" },
+    { "name": "C++", "slug": "cplusplus" },
+    { "name": "Assembly", "slug": "assemblyscript" }
+  ],
   "featured_repos": [
     {
       "name": "twister",
