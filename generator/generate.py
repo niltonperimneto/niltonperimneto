@@ -221,7 +221,9 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
         accent_stroke = "#1e293b"
         accent_fill_opacity = 0.08
 
+    total_repos = data.get("repositories", {}).get("totalCount", 30)
     cal = data.get("contributionsCollection", {}).get("contributionCalendar", {})
+    total_contribs = cal.get("totalContributions", 963)
     weeks = cal.get("weeks", [])
     
     weekly_counts = []
@@ -233,14 +235,15 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
     elif len(weekly_counts) < 52:
         weekly_counts = [0] * (52 - len(weekly_counts)) + weekly_counts
 
-    max_week = max(weekly_counts) if weekly_counts and max(weekly_counts) > 0 else 1
-    peak_idx = weekly_counts.index(max_week) if weekly_counts else 0
+    raw_max = max(weekly_counts) if weekly_counts else 0
+    peak_idx = weekly_counts.index(raw_max) if (weekly_counts and raw_max in weekly_counts) else 0
+    max_week = raw_max if raw_max > 0 else 1
 
-    # Full-width Activity chart dimensions
-    wave_x = 42
-    wave_w = 716
-    wave_y_base = 354
-    wave_y_top = 300
+    # Mobile portrait activity chart dimensions (344px wide wave)
+    wave_x = 28
+    wave_w = 344
+    wave_y_base = 394
+    wave_y_top = 346
     wave_h = wave_y_base - wave_y_top
 
     points = []
@@ -271,20 +274,6 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
         {"name": "Assembly", "slug": "assemblyscript"}
     ])[:6]
 
-    # Target Platforms
-    platforms = config.get("platforms", [
-        {"name": "Linux", "badge": "Kernel · Drivers"},
-        {"name": "macOS", "badge": "Darwin · Systems"},
-        {"name": "Web", "badge": "Wasm · Modern UI"}
-    ])[:3]
-
-    # Project Scope Breakdown for Pie Chart
-    project_scopes = config.get("project_scopes", [
-        {"name": "Drivers & Low-Level", "pct": 45},
-        {"name": "User Interface / GUI", "pct": 35},
-        {"name": "Systems & Daemons", "pct": 20}
-    ])[:3]
-
     featured = config.get("featured_repos", [])[:4]
     
     raw_name = config.get("name", "Nilton Perim Neto")
@@ -296,19 +285,17 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
     # Employment Status: Unemployed / Seeking Employment
     emp_status_raw = config.get("employment_status", "Seeking Employment · Open to Work")
     employment_status = xesc(emp_status_raw)
-    badge_w = max(215, len(emp_status_raw) * 6.5 + 34)
-    badge_x = 776 - badge_w - 12
 
     # Avatar image embedding or monogram fallback
     if avatar_data_uri:
-        avatar_svg = f"""      <image href="{avatar_data_uri}" x="36" y="32" width="44" height="44" preserveAspectRatio="xMidYMid slice"/>
-      <rect x="36" y="32" width="44" height="44" fill="none" stroke="{border}" stroke-width="1"/>"""
+        avatar_svg = f"""      <image href="{avatar_data_uri}" x="28" y="28" width="44" height="44" preserveAspectRatio="xMidYMid slice"/>
+      <rect x="28" y="28" width="44" height="44" fill="none" stroke="{border}" stroke-width="1"/>"""
     else:
-        avatar_svg = f"""      <rect x="36" y="32" width="44" height="44" fill="{inner_bg}" stroke="{border}" stroke-width="1"/>
-      <text x="58" y="59" text-anchor="middle" font-size="14" font-weight="700" fill="{text_primary}">NP</text>"""
+        avatar_svg = f"""      <rect x="28" y="28" width="44" height="44" fill="{inner_bg}" stroke="{border}" stroke-width="1"/>
+      <text x="50" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="{text_primary}">NP</text>"""
 
-    # Single Bento Block at a time (Full width stacked, strictly sharp angles, strictly monochrome)
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 618" width="100%" height="100%">
+    # Mobile portrait bento layout: 400 x 660 (strictly sharp angles, strictly monochromatic, stacked full-width blocks)
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 660" width="100%" height="100%">
   <defs>
     <style>
       text {{
@@ -321,8 +308,8 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
       }}
 
       .draw-stroke {{
-        stroke-dasharray: 3000;
-        stroke-dashoffset: 3000;
+        stroke-dasharray: 2000;
+        stroke-dashoffset: 2000;
         animation: drawPath 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }}
 
@@ -337,9 +324,8 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
       .delay-4 {{ animation-delay: 0.32s; }}
 
       .pulse-marker {{
-        animation: pulse 2.4s infinite ease-in-out;
+        animation: pulseSquare 2.5s infinite;
         transform-origin: center;
-        transform-box: fill-box;
       }}
 
       @keyframes drawPath {{
@@ -347,56 +333,69 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
       }}
 
       @keyframes fadeIn {{
-        to {{ opacity: 1; }}
+        from {{ opacity: 0; transform: translateY(3px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
       }}
 
-      @keyframes pulse {{
-        0%, 100% {{ transform: scale(1); opacity: 1; }}
-        50% {{ transform: scale(2.2); opacity: 0.25; }}
+      @keyframes pulseSquare {{
+        0%, 100% {{ opacity: 0.2; transform: scale(1); }}
+        50% {{ opacity: 0.9; transform: scale(1.6); }}
       }}
     </style>
 
+    <!-- Linear Gradients for Activity Rhythm Fill -->
     <linearGradient id="curveGrad_{theme}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="{accent}" stop-opacity="{accent_fill_opacity}"/>
+      <stop offset="0%" stop-color="{accent}" stop-opacity="{accent_fill_opacity * 1.5:.2f}"/>
+      <stop offset="70%" stop-color="{accent}" stop-opacity="{accent_fill_opacity * 0.5:.2f}"/>
       <stop offset="100%" stop-color="{accent}" stop-opacity="0.0"/>
     </linearGradient>
+
+    <!-- Subtle Grid Background Pattern (sharp orthogonal grid) -->
+    <pattern id="grid_{theme}" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="{border_subtle}" stroke-width="0.5" opacity="0.35"/>
+    </pattern>
   </defs>
 
-  <!-- Canvas Background -->
-  <rect width="800" height="618" fill="{bg}"/>
-  <rect x="0.5" y="0.5" width="799" height="617" fill="none" stroke="{border}" stroke-width="1"/>
+  <!-- Background Canvas -->
+  <rect width="400" height="660" fill="{bg}"/>
+  <rect width="400" height="660" fill="url(#grid_{theme})"/>
 
   <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
-    <rect x="24" y="20" width="752" height="68" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="16" y="16" width="368" height="94" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <!-- Profile Picture (GitHub Avatar) -->
+    <!-- User Avatar -->
 {avatar_svg}
 
     <!-- Name & Tagline -->
-    <text x="94" y="49" font-size="16" font-weight="600" fill="{text_primary}" letter-spacing="-0.01em">{display_name}</text>
-    <text x="94" y="67" font-size="11" font-weight="400" fill="{text_secondary}">{tagline}</text>
+    <text x="82" y="44" font-size="14.5" font-weight="700" fill="{text_primary}" letter-spacing="-0.01em">{display_name}</text>
+    <text x="82" y="60" font-size="10" font-weight="400" fill="{text_secondary}">{tagline}</text>
 
     <!-- Employment Status Badge -->
-    <rect x="{badge_x:.1f}" y="40" width="{badge_w:.1f}" height="28" fill="{inner_bg}" stroke="{border}" stroke-width="1"/>
-    <rect x="{badge_x + 10:.1f}" y="50" width="7" height="7" fill="{text_primary}"/>
-    <text x="{badge_x + 24:.1f}" y="58" font-size="10.5" font-weight="600" fill="{text_primary}">{employment_status}</text>
+    <rect x="28" y="78" width="344" height="22" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
+    <rect x="36" y="85" width="7" height="7" fill="{text_primary}"/>
+    <text x="49" y="93.5" font-size="9.5" font-weight="600" fill="{text_primary}">{employment_status}</text>
+    <text x="364" y="93.5" text-anchor="end" font-size="8.5" font-weight="500" fill="{text_tertiary}">STATUS: ACTIVE</text>
   </g>
 
   <!-- ==================== BENTO BLOCK 2: MY STACK ==================== -->
   <g class="fade-in delay-1">
-    <rect x="24" y="98" width="752" height="58" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
-    <text x="40" y="118" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// MY STACK</text>
+    <rect x="16" y="120" width="368" height="92" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <text x="28" y="137" font-size="9" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// MY STACK</text>
+    <text x="372" y="137" text-anchor="end" font-size="8.5" font-weight="500" fill="{text_tertiary}">6 Core Languages</text>
 """
 
-    tile_w = 112
+    tile_w = 110
     tile_h = 26
-    tile_start_x = 40
-    tile_gap = 9
+    start_x = 28
+    gap_x = 7
+    row_ys = [145, 175]
 
     for idx, lang in enumerate(stack_langs):
-        tx = tile_start_x + idx * (tile_w + tile_gap)
-        ty = 122
+        col = idx % 3
+        row = idx // 3
+        tx = start_x + col * (tile_w + gap_x)
+        ty = row_ys[row]
         lname = xesc(lang.get("name", ""))
         lslug = lang.get("slug", "").lower()
         path_data = LANGUAGE_ICONS.get(lslug, LANGUAGE_ICONS.get("rust"))
@@ -404,131 +403,80 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
         svg += f"""    <!-- {lname} Tile -->
     <g transform="translate({tx}, {ty})">
       <rect width="{tile_w}" height="{tile_h}" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
-      <g transform="translate(8, 4.5) scale(0.65)">
+      <g transform="translate(6, 4.5) scale(0.65)">
         <path fill-rule="evenodd" clip-rule="evenodd" d="{path_data}" fill="{text_secondary}"/>
       </g>
-      <text x="30" y="17" font-size="10.5" font-weight="600" fill="{text_primary}">{lname}</text>
+      <text x="27" y="17" font-size="10" font-weight="600" fill="{text_primary}">{lname}</text>
     </g>
 """
 
     svg += f"""  </g>
 
-  <!-- ==================== BENTO BLOCK 3: PLATFORMS & PROJECT SCOPE ==================== -->
+  <!-- ==================== BENTO BLOCK 3: ENGINEERING METRICS ==================== -->
   <g class="fade-in delay-2">
-    <rect x="24" y="166" width="752" height="92" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="16" y="222" width="368" height="76" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="40" y="186" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// PLATFORMS &amp; PROJECT SCOPE</text>
-    <text x="760" y="186" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Linux · macOS · Web // Drivers · UI · Systems</text>
-    <line x1="40" y1="194" x2="760" y2="194" stroke="{border_subtle}" stroke-width="1"/>
+    <text x="28" y="239" font-size="9" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ENGINEERING METRICS</text>
+    <text x="372" y="239" text-anchor="end" font-size="8.5" font-weight="500" fill="{text_tertiary}">Linux &amp; macOS</text>
+    <line x1="28" y1="246" x2="372" y2="246" stroke="{border_subtle}" stroke-width="0.75"/>
 
-    <!-- Column 1: Target Platforms -->
-    <text x="40" y="209" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">TARGET PLATFORMS</text>
-"""
+    <!-- Stat 1: Repositories -->
+    <text x="28" y="263" font-size="8" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">REPOSITORIES</text>
+    <text x="28" y="285" font-size="19" font-weight="600" fill="{text_primary}" class="tabular">{total_repos}</text>
 
-    chip_w = 104
-    chip_h = 32
-    chip_gap = 8
-    chip_start_x = 40
-    chip_y = 216
+    <!-- Stat 2: Contributions -->
+    <text x="145" y="263" font-size="8" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">CONTRIBUTIONS</text>
+    <text x="145" y="285" font-size="19" font-weight="600" fill="{text_primary}" class="tabular">{total_contribs}</text>
 
-    for idx, p in enumerate(platforms):
-        px = chip_start_x + idx * (chip_w + chip_gap)
-        p_name = xesc(p.get("name", "").upper())
-        p_badge = xesc(p.get("badge", ""))
-        svg += f"""    <!-- Platform Chip: {p_name} -->
-    <g transform="translate({px}, {chip_y})">
-      <rect width="{chip_w}" height="{chip_h}" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
-      <rect x="8" y="7" width="4" height="4" fill="{accent}"/>
-      <text x="17" y="12" font-size="9.5" font-weight="700" letter-spacing="0.04em" fill="{text_primary}">[ {p_name} ]</text>
-      <text x="8" y="25" font-size="8" font-weight="500" fill="{text_tertiary}">{p_badge}</text>
-    </g>
-"""
-
-    pie_svg = generate_pie_chart_svg(432, 234, 21, project_scopes, is_dark, card_bg, border)
-
-    svg += f"""    <!-- Column Divider -->
-    <line x1="385" y1="202" x2="385" y2="250" stroke="{border_subtle}" stroke-width="1"/>
-
-    <!-- Column 2: Preferred Project Scope & Pie Chart -->
-    <text x="405" y="209" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">PREFERRED PROJECT SCOPE</text>
-
-    <!-- Pizza Graphics (Pie Chart) -->
-    <g>
-{pie_svg}
-    </g>
-"""
-
-    legend_colors = ["#f3f4f6", "#9ca3af", "#4b5563"] if is_dark else ["#1e293b", "#64748b", "#cbd5e1"]
-    legend_text_colors = [text_primary, text_secondary, text_tertiary]
-    legend_ys = [224, 238, 252]
-
-    for idx, s in enumerate(project_scopes):
-        if idx >= len(legend_ys):
-            break
-        ly = legend_ys[idx]
-        s_name = xesc(s.get("name", ""))
-        s_pct = s.get("pct", 0)
-        swatch_c = legend_colors[idx % len(legend_colors)]
-        t_color = legend_text_colors[idx % len(legend_text_colors)]
-
-        leader_start = max(615, int(486 + len(s_name) * 6.2 + 8))
-        leader_line = f'<line x1="{leader_start}" y1="{ly - 3}" x2="732" y2="{ly - 3}" stroke="{border_subtle}" stroke-dasharray="2,3" stroke-width="0.75"/>' if leader_start < 730 else ''
-
-        svg += f"""    <!-- Scope Item: {s_name} -->
-    <g>
-      <rect x="472" y="{ly - 7}" width="7" height="7" fill="{swatch_c}"/>
-      <text x="486" y="{ly}" font-size="9" font-weight="600" fill="{t_color}">{s_name}</text>
-      {leader_line}
-      <text x="760" y="{ly}" text-anchor="end" font-size="9.5" font-weight="700" fill="{t_color}" class="tabular">{s_pct}%</text>
-    </g>
-"""
-
-    svg += f"""  </g>
+    <!-- Stat 3: Weekly Peak -->
+    <text x="262" y="263" font-size="8" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">WEEKLY PEAK</text>
+    <text x="262" y="285" font-size="19" font-weight="600" fill="{text_primary}" class="tabular">{max_week} <tspan font-size="9.5" font-weight="400" fill="{text_secondary}">/wk</tspan></text>
+  </g>
 
   <!-- ==================== BENTO BLOCK 4: ACTIVITY RHYTHM ==================== -->
   <g class="fade-in delay-3">
-    <rect x="24" y="268" width="752" height="116" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="16" y="308" width="368" height="114" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="40" y="288" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ACTIVITY RHYTHM</text>
-    <text x="760" y="288" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">52-Week Oscilloscope</text>
+    <text x="28" y="325" font-size="9" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ACTIVITY RHYTHM</text>
+    <text x="372" y="325" text-anchor="end" font-size="8.5" font-weight="500" fill="{text_tertiary}">52-Week Rhythm</text>
 
     <!-- Guide Lines -->
-    <line x1="42" y1="{wave_y_base}" x2="{wave_x + wave_w}" y2="{wave_y_base}" stroke="{border_subtle}" stroke-width="1"/>
-    <line x1="42" y1="{wave_y_top + wave_h/2:.1f}" x2="{wave_x + wave_w}" y2="{wave_y_top + wave_h/2:.1f}" stroke="{border_subtle}" stroke-dasharray="3,4" stroke-width="0.75"/>
+    <line x1="{wave_x}" y1="{wave_y_base}" x2="{wave_x + wave_w}" y2="{wave_y_base}" stroke="{border_subtle}" stroke-width="1"/>
+    <line x1="{wave_x}" y1="{wave_y_top + wave_h/2:.1f}" x2="{wave_x + wave_w}" y2="{wave_y_top + wave_h/2:.1f}" stroke="{border_subtle}" stroke-dasharray="3,4" stroke-width="0.75"/>
 
     <!-- Gradient Fill -->
     <path d="{area_d}" fill="url(#curveGrad_{theme})"/>
 
     <!-- Sharp Angular Trajectory Stroke -->
-    <path class="draw-stroke" d="{path_d}" fill="none" stroke="{accent_stroke}" stroke-width="1.6" stroke-linejoin="miter"/>
+    <path class="draw-stroke" d="{path_d}" fill="none" stroke="{accent_stroke}" stroke-width="1.5" stroke-linejoin="miter"/>
 
     <!-- Peak Indicator (Sharp Square) -->
     <g transform="translate({peak_x:.1f}, {peak_y:.1f})">
       <rect x="-3" y="-3" width="6" height="6" fill="{accent_stroke}"/>
       <rect x="-3" y="-3" width="6" height="6" fill="none" stroke="{accent_stroke}" stroke-width="0.8" class="pulse-marker"/>
-      <text x="0" y="-10" text-anchor="middle" font-size="9.5" font-weight="600" fill="{text_primary}">Peak: {max_week}</text>
+      <text x="0" y="-8" text-anchor="middle" font-size="8.5" font-weight="600" fill="{text_primary}">Peak: {max_week}</text>
     </g>
 
     <!-- Timeline Labels -->
-    <g font-size="9" font-weight="500" fill="{text_tertiary}">
-      <text x="{wave_x}" y="370">W01</text>
-      <text x="{wave_x + wave_w*0.25:.1f}" y="370" text-anchor="middle">W13</text>
-      <text x="{wave_x + wave_w*0.5:.1f}" y="370" text-anchor="middle">W26</text>
-      <text x="{wave_x + wave_w*0.75:.1f}" y="370" text-anchor="middle">W39</text>
-      <text x="{wave_x + wave_w}" y="370" text-anchor="end">W52</text>
+    <g font-size="8.5" font-weight="500" fill="{text_tertiary}">
+      <text x="{wave_x}" y="409">W01</text>
+      <text x="{wave_x + wave_w*0.25:.1f}" y="409" text-anchor="middle">W13</text>
+      <text x="{wave_x + wave_w*0.5:.1f}" y="409" text-anchor="middle">W26</text>
+      <text x="{wave_x + wave_w*0.75:.1f}" y="409" text-anchor="middle">W39</text>
+      <text x="{wave_x + wave_w}" y="409" text-anchor="end">W52</text>
     </g>
   </g>
 
   <!-- ==================== BENTO BLOCK 5: FEATURED PROJECTS ==================== -->
   <g class="fade-in delay-4">
-    <rect x="24" y="394" width="752" height="182" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="16" y="432" width="368" height="180" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="40" y="414" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// FEATURED PROJECTS</text>
-    <text x="760" y="414" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Open Source Systems &amp; Tools</text>
-    <line x1="40" y1="422" x2="760" y2="422" stroke="{border_subtle}" stroke-width="1"/>
+    <text x="28" y="449" font-size="9" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// FEATURED PROJECTS</text>
+    <text x="372" y="449" text-anchor="end" font-size="8.5" font-weight="500" fill="{text_tertiary}">Open Source</text>
+    <line x1="28" y1="456" x2="372" y2="456" stroke="{border_subtle}" stroke-width="0.75"/>
 """
 
-    row_ys = [430, 466, 502, 538]
+    row_ys = [461, 497, 533, 569]
 
     for idx, repo in enumerate(featured):
         if idx >= len(row_ys):
@@ -540,22 +488,26 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
         r_stars = repo.get("stars", 0)
 
         star_str = f"★ {r_stars}" if r_stars > 0 else ""
-        tag_w = max(38, len(r_stack) * 5.8 + 12)
+        tag_w = max(34, len(r_stack) * 5.4 + 10)
+        star_offset = 28 if r_stars > 0 else 0
+        tag_x = 372 - star_offset - tag_w
 
         # Subtle row divider
-        div_line = f"""<line x1="40" y1="{ry + 30}" x2="760" y2="{ry + 30}" stroke="{border_subtle}" stroke-width="0.75"/>""" if idx < 3 else ""
+        div_line = f"""<line x1="28" y1="{ry + 32}" x2="372" y2="{ry + 32}" stroke="{border_subtle}" stroke-width="0.5"/>""" if idx < 3 else ""
 
         svg += f"""    <!-- Project Row {idx + 1} -->
     <g>
-      <text x="40" y="{ry + 19}" font-size="12" font-weight="600" fill="{text_primary}">[{idx + 1:02d}] {r_name}</text>
-      <text x="180" y="{ry + 19}" font-size="10.5" font-weight="400" fill="{text_secondary}">{r_desc}</text>
+      <text x="28" y="{ry + 13}" font-size="11" font-weight="600" fill="{text_primary}">[{idx + 1:02d}] {r_name}</text>
       
       <!-- Tech Badge -->
-      <rect x="{670 - tag_w}" y="{ry + 6}" width="{tag_w}" height="17" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
-      <text x="{670 - tag_w/2}" y="{ry + 18}" text-anchor="middle" font-size="8.5" font-weight="500" fill="{text_tertiary}">{r_stack}</text>
+      <rect x="{tag_x:.1f}" y="{ry + 2}" width="{tag_w:.1f}" height="14" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
+      <text x="{tag_x + tag_w/2:.1f}" y="{ry + 12}" text-anchor="middle" font-size="7.5" font-weight="500" fill="{text_tertiary}">{r_stack}</text>
       
       <!-- Stars -->
-      <text x="756" y="{ry + 19}" text-anchor="end" font-size="9.5" font-weight="600" fill="{text_primary}">{star_str}</text>
+      <text x="372" y="{ry + 13}" text-anchor="end" font-size="9" font-weight="600" fill="{text_primary}">{star_str}</text>
+
+      <!-- Description Line -->
+      <text x="28" y="{ry + 26}" font-size="9" font-weight="400" fill="{text_secondary}">{r_desc}</text>
       {div_line}
     </g>
 """
@@ -564,10 +516,11 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
 
   <!-- ==================== FOOTER ==================== -->
   <g class="fade-in delay-4">
-    <line x1="24" y1="588" x2="776" y2="588" stroke="{border}" stroke-width="1"/>
+    <line x1="16" y1="622" x2="384" y2="622" stroke="{border}" stroke-width="0.75"/>
     
-    <text x="28" y="604" font-size="9.5" font-weight="400" fill="{text_tertiary}">{affiliation} · {location} · {employment_status}</text>
-    <text x="772" y="604" text-anchor="end" font-size="9.5" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
+    <text x="20" y="635" font-size="8" font-weight="400" fill="{text_tertiary}">{affiliation} · {location}</text>
+    <text x="20" y="647" font-size="7.5" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
+    <text x="380" y="647" text-anchor="end" font-size="7.5" font-weight="500" fill="{text_tertiary}">HUD v2.4</text>
   </g>
 </svg>
 """
