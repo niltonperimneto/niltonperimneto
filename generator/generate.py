@@ -6,6 +6,7 @@ import subprocess
 import urllib.request
 import base64
 import html
+import math
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(BASE_DIR, "config.json")
@@ -33,6 +34,62 @@ LANGUAGE_ICONS = {
     "assembly": "M0 0v24h24V0h-9.225c0 1.406-1.04 2.813-2.756 2.813A2.766 2.766 0 019.234 0zm18.204 10.947c.707 0 1.314.137 1.82.412.517.264.96.717 1.33 1.361l-1.726 1.108c-.19-.338-.395-.58-.617-.728a1.422 1.422 0 00-.807-.222c-.327 0-.586.09-.776.27a.896.896 0 00-.285.68c0 .337.106.596.317.775.222.17.57.36 1.045.57l.554.238c.474.2.891.411 1.25.633.37.21.675.453.918.728.253.264.443.57.57.918.137.337.206.738.206 1.203a3 3 0 01-.285 1.33c-.18.38-.433.701-.76.965a3.419 3.419 0 01-1.171.601c-.443.127-.929.19-1.456.19a5.31 5.31 0 01-1.41-.174 4.624 4.624 0 01-1.139-.475 3.922 3.922 0 01-.886-.712 4.48 4.48 0 01-.602-.902L16.1 18.67c.242.39.527.712.855.966.337.253.78.38 1.33.38.463 0 .827-.1 1.091-.301.275-.211.412-.475.412-.792 0-.38-.143-.664-.428-.854-.285-.19-.68-.396-1.187-.618l-.554-.237a8.12 8.12 0 01-1.092-.554 3.64 3.64 0 01-.839-.696 2.887 2.887 0 01-.538-.903 3.375 3.375 0 01-.19-1.187c0-.411.074-.796.222-1.155a2.91 2.91 0 01.649-.934c.285-.264.628-.47 1.029-.617.4-.148.849-.222 1.345-.222zm-8.796.032h.19l4.922 10.858h-2.327l-.506-1.219H7.318l-.506 1.219H4.675zm.063 3.988a22.21 22.21 0 01-.206.697l-.205.649a6.979 6.979 0 01-.222.585l-.776 1.868h2.834l-.776-1.868a15.492 15.492 0 01-.237-.633 23.741 23.741 0 01-.412-1.298z",
     "webassembly": "M14.745 0c0 .042 0 .085 0 .129 0 1.52-1.232 2.752-2.752 2.752-1.52 0-2.752-1.232-2.752-2.752 0-.045 0-.087 0-.129H0v24h24V0H14.745zM11.454 21.431l-1.169-5.783h-.02l-1.264 5.783H7.39l-1.824-8.497h1.59l1.088 5.783h.02l1.311-5.783h1.487l1.177 5.854h.02l1.242-5.854h1.561l-2.027 8.497H11.454zM20.209 21.431l-.542-1.891h-2.861l-0.417 1.891h-1.59l2.056-8.497h2.509l2.5 8.497H20.209zM17.812 15.028l-.694 3.118h2.159l-.796-3.118H17.812z"
 }
+
+def generate_pie_chart_svg(cx, cy, r, slices, is_dark, card_bg, border):
+    """
+    Renders a monochromatic precision pie chart ('pizza graphic') with slice dividers.
+    """
+    total = sum(s.get("pct", 0) for s in slices)
+    if total <= 0:
+        total = 100
+
+    # High-contrast monochromatic grayscale palette
+    if is_dark:
+        colors = ["#f3f4f6", "#9ca3af", "#4b5563", "#374151"]
+    else:
+        colors = ["#1e293b", "#64748b", "#cbd5e1", "#e2e8f0"]
+
+    start_angle = -math.pi / 2  # 12 o'clock
+    svg_paths = []
+    
+    current_angle = start_angle
+    for idx, s in enumerate(slices):
+        pct = s.get("pct", 0)
+        if pct <= 0:
+            continue
+        slice_angle = (pct / total) * 2 * math.pi
+        end_angle = current_angle + slice_angle
+        
+        fill_color = colors[idx % len(colors)]
+        
+        # When slice is virtually full circle (>= 99.9%)
+        if pct >= total:
+            svg_paths.append(
+                f'    <circle cx="{cx:.2f}" cy="{cy:.2f}" r="{r:.2f}" fill="{fill_color}" stroke="{card_bg}" stroke-width="1.5"/>'
+            )
+            break
+            
+        x1 = cx + r * math.cos(current_angle)
+        y1 = cy + r * math.sin(current_angle)
+        x2 = cx + r * math.cos(end_angle)
+        y2 = cy + r * math.sin(end_angle)
+        
+        large_arc = 1 if slice_angle > math.pi else 0
+        
+        path = (
+            f'    <path d="M {cx:.2f} {cy:.2f} '
+            f'L {x1:.2f} {y1:.2f} '
+            f'A {r:.2f} {r:.2f} 0 {large_arc} 1 {x2:.2f} {y2:.2f} Z" '
+            f'fill="{fill_color}" stroke="{card_bg}" stroke-width="1.5"/>'
+        )
+        svg_paths.append(path)
+        current_angle = end_angle
+
+    # Outer border circle & center hub pin
+    border_circle = f'    <circle cx="{cx:.2f}" cy="{cy:.2f}" r="{r:.2f}" fill="none" stroke="{border}" stroke-width="0.75"/>'
+    center_pin = f'    <circle cx="{cx:.2f}" cy="{cy:.2f}" r="2.2" fill="{card_bg}" stroke="{border}" stroke-width="0.75"/>'
+    
+    return "\n".join(svg_paths) + "\n" + border_circle + "\n" + center_pin
 
 def fetch_avatar_data_uri(avatar_url):
     if not avatar_url:
@@ -164,9 +221,7 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
         accent_stroke = "#1e293b"
         accent_fill_opacity = 0.08
 
-    total_repos = data.get("repositories", {}).get("totalCount", 30)
     cal = data.get("contributionsCollection", {}).get("contributionCalendar", {})
-    total_contribs = cal.get("totalContributions", 963)
     weeks = cal.get("weeks", [])
     
     weekly_counts = []
@@ -184,8 +239,8 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
     # Full-width Activity chart dimensions
     wave_x = 42
     wave_w = 716
-    wave_y_base = 340
-    wave_y_top = 286
+    wave_y_base = 354
+    wave_y_top = 300
     wave_h = wave_y_base - wave_y_top
 
     points = []
@@ -216,6 +271,20 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
         {"name": "Assembly", "slug": "assemblyscript"}
     ])[:6]
 
+    # Target Platforms
+    platforms = config.get("platforms", [
+        {"name": "Linux", "badge": "Kernel · Drivers"},
+        {"name": "macOS", "badge": "Darwin · Systems"},
+        {"name": "Web", "badge": "Wasm · Modern UI"}
+    ])[:3]
+
+    # Project Scope Breakdown for Pie Chart
+    project_scopes = config.get("project_scopes", [
+        {"name": "Drivers & Low-Level", "pct": 45},
+        {"name": "User Interface / GUI", "pct": 35},
+        {"name": "Systems & Daemons", "pct": 20}
+    ])[:3]
+
     featured = config.get("featured_repos", [])[:4]
     
     raw_name = config.get("name", "Nilton Perim Neto")
@@ -239,7 +308,7 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
       <text x="58" y="59" text-anchor="middle" font-size="14" font-weight="700" fill="{text_primary}">NP</text>"""
 
     # Single Bento Block at a time (Full width stacked, strictly sharp angles, strictly monochrome)
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 604" width="100%" height="100%">
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 618" width="100%" height="100%">
   <defs>
     <style>
       text {{
@@ -294,8 +363,8 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
   </defs>
 
   <!-- Canvas Background -->
-  <rect width="800" height="604" fill="{bg}"/>
-  <rect x="0.5" y="0.5" width="799" height="603" fill="none" stroke="{border}" stroke-width="1"/>
+  <rect width="800" height="618" fill="{bg}"/>
+  <rect x="0.5" y="0.5" width="799" height="617" fill="none" stroke="{border}" stroke-width="1"/>
 
   <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
@@ -344,33 +413,84 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
 
     svg += f"""  </g>
 
-  <!-- ==================== BENTO BLOCK 3: ENGINEERING METRICS ==================== -->
+  <!-- ==================== BENTO BLOCK 3: PLATFORMS & PROJECT SCOPE ==================== -->
   <g class="fade-in delay-2">
-    <rect x="24" y="166" width="752" height="78" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="24" y="166" width="752" height="92" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="40" y="186" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ENGINEERING METRICS</text>
-    <text x="760" y="186" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Linux &amp; macOS // x86_64 &amp; ARM64</text>
+    <text x="40" y="186" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// PLATFORMS &amp; PROJECT SCOPE</text>
+    <text x="760" y="186" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Linux · macOS · Web // Drivers · UI · Systems</text>
     <line x1="40" y1="194" x2="760" y2="194" stroke="{border_subtle}" stroke-width="1"/>
 
-    <!-- Stat 1: Repositories -->
-    <text x="40" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">REPOSITORIES</text>
-    <text x="40" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_repos}</text>
+    <!-- Column 1: Target Platforms -->
+    <text x="40" y="209" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">TARGET PLATFORMS</text>
+"""
 
-    <!-- Stat 2: Contributions -->
-    <text x="280" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">YEARLY CONTRIBUTIONS</text>
-    <text x="280" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_contribs}</text>
+    chip_w = 104
+    chip_h = 32
+    chip_gap = 8
+    chip_start_x = 40
+    chip_y = 216
 
-    <!-- Stat 3: Weekly Peak -->
-    <text x="530" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">WEEKLY ACTIVITY PEAK</text>
-    <text x="530" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{max_week} <tspan font-size="11" font-weight="400" fill="{text_secondary}">commits / wk</tspan></text>
-  </g>
+    for idx, p in enumerate(platforms):
+        px = chip_start_x + idx * (chip_w + chip_gap)
+        p_name = xesc(p.get("name", "").upper())
+        p_badge = xesc(p.get("badge", ""))
+        svg += f"""    <!-- Platform Chip: {p_name} -->
+    <g transform="translate({px}, {chip_y})">
+      <rect width="{chip_w}" height="{chip_h}" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
+      <rect x="8" y="7" width="4" height="4" fill="{accent}"/>
+      <text x="17" y="12" font-size="9.5" font-weight="700" letter-spacing="0.04em" fill="{text_primary}">[ {p_name} ]</text>
+      <text x="8" y="25" font-size="8" font-weight="500" fill="{text_tertiary}">{p_badge}</text>
+    </g>
+"""
+
+    pie_svg = generate_pie_chart_svg(432, 234, 21, project_scopes, is_dark, card_bg, border)
+
+    svg += f"""    <!-- Column Divider -->
+    <line x1="385" y1="202" x2="385" y2="250" stroke="{border_subtle}" stroke-width="1"/>
+
+    <!-- Column 2: Preferred Project Scope & Pie Chart -->
+    <text x="405" y="209" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">PREFERRED PROJECT SCOPE</text>
+
+    <!-- Pizza Graphics (Pie Chart) -->
+    <g>
+{pie_svg}
+    </g>
+"""
+
+    legend_colors = ["#f3f4f6", "#9ca3af", "#4b5563"] if is_dark else ["#1e293b", "#64748b", "#cbd5e1"]
+    legend_text_colors = [text_primary, text_secondary, text_tertiary]
+    legend_ys = [224, 238, 252]
+
+    for idx, s in enumerate(project_scopes):
+        if idx >= len(legend_ys):
+            break
+        ly = legend_ys[idx]
+        s_name = xesc(s.get("name", ""))
+        s_pct = s.get("pct", 0)
+        swatch_c = legend_colors[idx % len(legend_colors)]
+        t_color = legend_text_colors[idx % len(legend_text_colors)]
+
+        leader_start = max(615, int(486 + len(s_name) * 6.2 + 8))
+        leader_line = f'<line x1="{leader_start}" y1="{ly - 3}" x2="732" y2="{ly - 3}" stroke="{border_subtle}" stroke-dasharray="2,3" stroke-width="0.75"/>' if leader_start < 730 else ''
+
+        svg += f"""    <!-- Scope Item: {s_name} -->
+    <g>
+      <rect x="472" y="{ly - 7}" width="7" height="7" fill="{swatch_c}"/>
+      <text x="486" y="{ly}" font-size="9" font-weight="600" fill="{t_color}">{s_name}</text>
+      {leader_line}
+      <text x="760" y="{ly}" text-anchor="end" font-size="9.5" font-weight="700" fill="{t_color}" class="tabular">{s_pct}%</text>
+    </g>
+"""
+
+    svg += f"""  </g>
 
   <!-- ==================== BENTO BLOCK 4: ACTIVITY RHYTHM ==================== -->
   <g class="fade-in delay-3">
-    <rect x="24" y="254" width="752" height="116" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="24" y="268" width="752" height="116" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="40" y="274" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ACTIVITY RHYTHM</text>
-    <text x="760" y="274" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">52-Week Oscilloscope</text>
+    <text x="40" y="288" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ACTIVITY RHYTHM</text>
+    <text x="760" y="288" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">52-Week Oscilloscope</text>
 
     <!-- Guide Lines -->
     <line x1="42" y1="{wave_y_base}" x2="{wave_x + wave_w}" y2="{wave_y_base}" stroke="{border_subtle}" stroke-width="1"/>
@@ -391,24 +511,24 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
 
     <!-- Timeline Labels -->
     <g font-size="9" font-weight="500" fill="{text_tertiary}">
-      <text x="{wave_x}" y="356">W01</text>
-      <text x="{wave_x + wave_w*0.25:.1f}" y="356" text-anchor="middle">W13</text>
-      <text x="{wave_x + wave_w*0.5:.1f}" y="356" text-anchor="middle">W26</text>
-      <text x="{wave_x + wave_w*0.75:.1f}" y="356" text-anchor="middle">W39</text>
-      <text x="{wave_x + wave_w}" y="356" text-anchor="end">W52</text>
+      <text x="{wave_x}" y="370">W01</text>
+      <text x="{wave_x + wave_w*0.25:.1f}" y="370" text-anchor="middle">W13</text>
+      <text x="{wave_x + wave_w*0.5:.1f}" y="370" text-anchor="middle">W26</text>
+      <text x="{wave_x + wave_w*0.75:.1f}" y="370" text-anchor="middle">W39</text>
+      <text x="{wave_x + wave_w}" y="370" text-anchor="end">W52</text>
     </g>
   </g>
 
   <!-- ==================== BENTO BLOCK 5: FEATURED PROJECTS ==================== -->
   <g class="fade-in delay-4">
-    <rect x="24" y="380" width="752" height="182" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="24" y="394" width="752" height="182" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <text x="40" y="400" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// FEATURED PROJECTS</text>
-    <text x="760" y="400" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Open Source Systems &amp; Tools</text>
-    <line x1="40" y1="408" x2="760" y2="408" stroke="{border_subtle}" stroke-width="1"/>
+    <text x="40" y="414" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// FEATURED PROJECTS</text>
+    <text x="760" y="414" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Open Source Systems &amp; Tools</text>
+    <line x1="40" y1="422" x2="760" y2="422" stroke="{border_subtle}" stroke-width="1"/>
 """
 
-    row_ys = [416, 452, 488, 524]
+    row_ys = [430, 466, 502, 538]
 
     for idx, repo in enumerate(featured):
         if idx >= len(row_ys):
@@ -444,10 +564,10 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
 
   <!-- ==================== FOOTER ==================== -->
   <g class="fade-in delay-4">
-    <line x1="24" y1="574" x2="776" y2="574" stroke="{border}" stroke-width="1"/>
+    <line x1="24" y1="588" x2="776" y2="588" stroke="{border}" stroke-width="1"/>
     
-    <text x="28" y="590" font-size="9.5" font-weight="400" fill="{text_tertiary}">{affiliation} · {location} · {employment_status}</text>
-    <text x="772" y="590" text-anchor="end" font-size="9.5" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
+    <text x="28" y="604" font-size="9.5" font-weight="400" fill="{text_tertiary}">{affiliation} · {location} · {employment_status}</text>
+    <text x="772" y="604" text-anchor="end" font-size="9.5" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
   </g>
 </svg>
 """

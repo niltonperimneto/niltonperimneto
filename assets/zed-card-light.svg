@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 604" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 618" width="100%" height="100%">
   <defs>
     <style>
       text {
@@ -53,8 +53,8 @@
   </defs>
 
   <!-- Canvas Background -->
-  <rect width="800" height="604" fill="#ffffff"/>
-  <rect x="0.5" y="0.5" width="799" height="603" fill="none" stroke="#d1d5db" stroke-width="1"/>
+  <rect width="800" height="618" fill="#ffffff"/>
+  <rect x="0.5" y="0.5" width="799" height="617" fill="none" stroke="#d1d5db" stroke-width="1"/>
 
   <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
@@ -128,46 +128,93 @@
     </g>
   </g>
 
-  <!-- ==================== BENTO BLOCK 3: ENGINEERING METRICS ==================== -->
+  <!-- ==================== BENTO BLOCK 3: PLATFORMS & PROJECT SCOPE ==================== -->
   <g class="fade-in delay-2">
-    <rect x="24" y="166" width="752" height="78" fill="#f8fafc" stroke="#d1d5db" stroke-width="1"/>
+    <rect x="24" y="166" width="752" height="92" fill="#f8fafc" stroke="#d1d5db" stroke-width="1"/>
     
-    <text x="40" y="186" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="#94a3b8">// ENGINEERING METRICS</text>
-    <text x="760" y="186" text-anchor="end" font-size="9" font-weight="500" fill="#94a3b8">Linux &amp; macOS // x86_64 &amp; ARM64</text>
+    <text x="40" y="186" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="#94a3b8">// PLATFORMS &amp; PROJECT SCOPE</text>
+    <text x="760" y="186" text-anchor="end" font-size="9" font-weight="500" fill="#94a3b8">Linux · macOS · Web // Drivers · UI · Systems</text>
     <line x1="40" y1="194" x2="760" y2="194" stroke="#e5e7eb" stroke-width="1"/>
 
-    <!-- Stat 1: Repositories -->
-    <text x="40" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="#94a3b8">REPOSITORIES</text>
-    <text x="40" y="232" font-size="20" font-weight="600" fill="#0f172a" class="tabular">14</text>
+    <!-- Column 1: Target Platforms -->
+    <text x="40" y="209" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="#94a3b8">TARGET PLATFORMS</text>
+    <!-- Platform Chip: LINUX -->
+    <g transform="translate(40, 216)">
+      <rect width="104" height="32" fill="#f1f5f9" stroke="#d1d5db" stroke-width="0.75"/>
+      <rect x="8" y="7" width="4" height="4" fill="#0f172a"/>
+      <text x="17" y="12" font-size="9.5" font-weight="700" letter-spacing="0.04em" fill="#0f172a">[ LINUX ]</text>
+      <text x="8" y="25" font-size="8" font-weight="500" fill="#94a3b8">Kernel · Drivers</text>
+    </g>
+    <!-- Platform Chip: MACOS -->
+    <g transform="translate(152, 216)">
+      <rect width="104" height="32" fill="#f1f5f9" stroke="#d1d5db" stroke-width="0.75"/>
+      <rect x="8" y="7" width="4" height="4" fill="#0f172a"/>
+      <text x="17" y="12" font-size="9.5" font-weight="700" letter-spacing="0.04em" fill="#0f172a">[ MACOS ]</text>
+      <text x="8" y="25" font-size="8" font-weight="500" fill="#94a3b8">Darwin · Systems</text>
+    </g>
+    <!-- Platform Chip: WEB -->
+    <g transform="translate(264, 216)">
+      <rect width="104" height="32" fill="#f1f5f9" stroke="#d1d5db" stroke-width="0.75"/>
+      <rect x="8" y="7" width="4" height="4" fill="#0f172a"/>
+      <text x="17" y="12" font-size="9.5" font-weight="700" letter-spacing="0.04em" fill="#0f172a">[ WEB ]</text>
+      <text x="8" y="25" font-size="8" font-weight="500" fill="#94a3b8">Wasm · Modern UI</text>
+    </g>
+    <!-- Column Divider -->
+    <line x1="385" y1="202" x2="385" y2="250" stroke="#e5e7eb" stroke-width="1"/>
 
-    <!-- Stat 2: Contributions -->
-    <text x="280" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="#94a3b8">YEARLY CONTRIBUTIONS</text>
-    <text x="280" y="232" font-size="20" font-weight="600" fill="#0f172a" class="tabular">967</text>
+    <!-- Column 2: Preferred Project Scope & Pie Chart -->
+    <text x="405" y="209" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="#94a3b8">PREFERRED PROJECT SCOPE</text>
 
-    <!-- Stat 3: Weekly Peak -->
-    <text x="530" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="#94a3b8">WEEKLY ACTIVITY PEAK</text>
-    <text x="530" y="232" font-size="20" font-weight="600" fill="#0f172a" class="tabular">163 <tspan font-size="11" font-weight="400" fill="#475569">commits / wk</tspan></text>
+    <!-- Pizza Graphics (Pie Chart) -->
+    <g>
+    <path d="M 432.00 234.00 L 432.00 213.00 A 21.00 21.00 0 0 1 438.49 253.97 Z" fill="#1e293b" stroke="#f8fafc" stroke-width="1.5"/>
+    <path d="M 432.00 234.00 L 438.49 253.97 A 21.00 21.00 0 0 1 412.03 227.51 Z" fill="#64748b" stroke="#f8fafc" stroke-width="1.5"/>
+    <path d="M 432.00 234.00 L 412.03 227.51 A 21.00 21.00 0 0 1 432.00 213.00 Z" fill="#cbd5e1" stroke="#f8fafc" stroke-width="1.5"/>
+    <circle cx="432.00" cy="234.00" r="21.00" fill="none" stroke="#d1d5db" stroke-width="0.75"/>
+    <circle cx="432.00" cy="234.00" r="2.2" fill="#f8fafc" stroke="#d1d5db" stroke-width="0.75"/>
+    </g>
+    <!-- Scope Item: Drivers &amp; Low-Level -->
+    <g>
+      <rect x="472" y="217" width="7" height="7" fill="#1e293b"/>
+      <text x="486" y="224" font-size="9" font-weight="600" fill="#0f172a">Drivers &amp; Low-Level</text>
+      <line x1="636" y1="221" x2="732" y2="221" stroke="#e5e7eb" stroke-dasharray="2,3" stroke-width="0.75"/>
+      <text x="760" y="224" text-anchor="end" font-size="9.5" font-weight="700" fill="#0f172a" class="tabular">45%</text>
+    </g>
+    <!-- Scope Item: User Interface / GUI -->
+    <g>
+      <rect x="472" y="231" width="7" height="7" fill="#64748b"/>
+      <text x="486" y="238" font-size="9" font-weight="600" fill="#475569">User Interface / GUI</text>
+      <line x1="618" y1="235" x2="732" y2="235" stroke="#e5e7eb" stroke-dasharray="2,3" stroke-width="0.75"/>
+      <text x="760" y="238" text-anchor="end" font-size="9.5" font-weight="700" fill="#475569" class="tabular">35%</text>
+    </g>
+    <!-- Scope Item: Systems &amp; Daemons -->
+    <g>
+      <rect x="472" y="245" width="7" height="7" fill="#cbd5e1"/>
+      <text x="486" y="252" font-size="9" font-weight="600" fill="#94a3b8">Systems &amp; Daemons</text>
+      <line x1="624" y1="249" x2="732" y2="249" stroke="#e5e7eb" stroke-dasharray="2,3" stroke-width="0.75"/>
+      <text x="760" y="252" text-anchor="end" font-size="9.5" font-weight="700" fill="#94a3b8" class="tabular">20%</text>
+    </g>
   </g>
 
   <!-- ==================== BENTO BLOCK 4: ACTIVITY RHYTHM ==================== -->
   <g class="fade-in delay-3">
-    <rect x="24" y="254" width="752" height="116" fill="#f8fafc" stroke="#d1d5db" stroke-width="1"/>
+    <rect x="24" y="268" width="752" height="116" fill="#f8fafc" stroke="#d1d5db" stroke-width="1"/>
     
-    <text x="40" y="274" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="#94a3b8">// ACTIVITY RHYTHM</text>
-    <text x="760" y="274" text-anchor="end" font-size="9" font-weight="500" fill="#94a3b8">52-Week Oscilloscope</text>
+    <text x="40" y="288" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="#94a3b8">// ACTIVITY RHYTHM</text>
+    <text x="760" y="288" text-anchor="end" font-size="9" font-weight="500" fill="#94a3b8">52-Week Oscilloscope</text>
 
     <!-- Guide Lines -->
-    <line x1="42" y1="340" x2="758" y2="340" stroke="#e5e7eb" stroke-width="1"/>
-    <line x1="42" y1="313.0" x2="758" y2="313.0" stroke="#e5e7eb" stroke-dasharray="3,4" stroke-width="0.75"/>
+    <line x1="42" y1="354" x2="758" y2="354" stroke="#e5e7eb" stroke-width="1"/>
+    <line x1="42" y1="327.0" x2="758" y2="327.0" stroke="#e5e7eb" stroke-dasharray="3,4" stroke-width="0.75"/>
 
     <!-- Gradient Fill -->
-    <path d="M 42.0 339.0 L 56.0 340.0 L 70.1 340.0 L 84.1 340.0 L 98.2 340.0 L 112.2 340.0 L 126.2 340.0 L 140.3 339.7 L 154.3 340.0 L 168.4 340.0 L 182.4 286.0 L 196.4 326.4 L 210.5 330.7 L 224.5 339.3 L 238.5 333.4 L 252.6 328.4 L 266.6 338.3 L 280.7 322.4 L 294.7 339.7 L 308.7 340.0 L 322.8 339.3 L 336.8 340.0 L 350.9 336.7 L 364.9 333.4 L 378.9 338.3 L 393.0 316.8 L 407.0 332.7 L 421.1 334.7 L 435.1 338.0 L 449.1 340.0 L 463.2 340.0 L 477.2 339.7 L 491.3 336.4 L 505.3 340.0 L 519.3 334.4 L 533.4 340.0 L 547.4 337.3 L 561.5 326.7 L 575.5 335.4 L 589.5 330.7 L 603.6 334.7 L 617.6 336.7 L 631.6 340.0 L 645.7 340.0 L 659.7 340.0 L 673.8 340.0 L 687.8 340.0 L 701.8 338.7 L 715.9 319.8 L 729.9 305.9 L 744.0 312.5 L 758.0 317.5 L 758.0 340 L 42.0 340 Z" fill="url(#curveGrad_light)"/>
+    <path d="M 42.0 353.0 L 56.0 354.0 L 70.1 354.0 L 84.1 354.0 L 98.2 354.0 L 112.2 354.0 L 126.2 354.0 L 140.3 353.7 L 154.3 354.0 L 168.4 354.0 L 182.4 300.0 L 196.4 340.4 L 210.5 344.7 L 224.5 353.3 L 238.5 347.4 L 252.6 342.4 L 266.6 352.3 L 280.7 336.4 L 294.7 353.7 L 308.7 354.0 L 322.8 353.3 L 336.8 354.0 L 350.9 350.7 L 364.9 347.4 L 378.9 352.3 L 393.0 330.8 L 407.0 346.7 L 421.1 348.7 L 435.1 352.0 L 449.1 354.0 L 463.2 354.0 L 477.2 353.7 L 491.3 350.4 L 505.3 354.0 L 519.3 348.4 L 533.4 354.0 L 547.4 351.3 L 561.5 340.7 L 575.5 349.4 L 589.5 344.7 L 603.6 348.7 L 617.6 350.7 L 631.6 354.0 L 645.7 354.0 L 659.7 354.0 L 673.8 354.0 L 687.8 354.0 L 701.8 352.7 L 715.9 333.8 L 729.9 319.9 L 744.0 326.5 L 758.0 331.5 L 758.0 354 L 42.0 354 Z" fill="url(#curveGrad_light)"/>
 
     <!-- Sharp Angular Trajectory Stroke -->
-    <path class="draw-stroke" d="M 42.0 339.0 L 56.0 340.0 L 70.1 340.0 L 84.1 340.0 L 98.2 340.0 L 112.2 340.0 L 126.2 340.0 L 140.3 339.7 L 154.3 340.0 L 168.4 340.0 L 182.4 286.0 L 196.4 326.4 L 210.5 330.7 L 224.5 339.3 L 238.5 333.4 L 252.6 328.4 L 266.6 338.3 L 280.7 322.4 L 294.7 339.7 L 308.7 340.0 L 322.8 339.3 L 336.8 340.0 L 350.9 336.7 L 364.9 333.4 L 378.9 338.3 L 393.0 316.8 L 407.0 332.7 L 421.1 334.7 L 435.1 338.0 L 449.1 340.0 L 463.2 340.0 L 477.2 339.7 L 491.3 336.4 L 505.3 340.0 L 519.3 334.4 L 533.4 340.0 L 547.4 337.3 L 561.5 326.7 L 575.5 335.4 L 589.5 330.7 L 603.6 334.7 L 617.6 336.7 L 631.6 340.0 L 645.7 340.0 L 659.7 340.0 L 673.8 340.0 L 687.8 340.0 L 701.8 338.7 L 715.9 319.8 L 729.9 305.9 L 744.0 312.5 L 758.0 317.5" fill="none" stroke="#1e293b" stroke-width="1.6" stroke-linejoin="miter"/>
+    <path class="draw-stroke" d="M 42.0 353.0 L 56.0 354.0 L 70.1 354.0 L 84.1 354.0 L 98.2 354.0 L 112.2 354.0 L 126.2 354.0 L 140.3 353.7 L 154.3 354.0 L 168.4 354.0 L 182.4 300.0 L 196.4 340.4 L 210.5 344.7 L 224.5 353.3 L 238.5 347.4 L 252.6 342.4 L 266.6 352.3 L 280.7 336.4 L 294.7 353.7 L 308.7 354.0 L 322.8 353.3 L 336.8 354.0 L 350.9 350.7 L 364.9 347.4 L 378.9 352.3 L 393.0 330.8 L 407.0 346.7 L 421.1 348.7 L 435.1 352.0 L 449.1 354.0 L 463.2 354.0 L 477.2 353.7 L 491.3 350.4 L 505.3 354.0 L 519.3 348.4 L 533.4 354.0 L 547.4 351.3 L 561.5 340.7 L 575.5 349.4 L 589.5 344.7 L 603.6 348.7 L 617.6 350.7 L 631.6 354.0 L 645.7 354.0 L 659.7 354.0 L 673.8 354.0 L 687.8 354.0 L 701.8 352.7 L 715.9 333.8 L 729.9 319.9 L 744.0 326.5 L 758.0 331.5" fill="none" stroke="#1e293b" stroke-width="1.6" stroke-linejoin="miter"/>
 
     <!-- Peak Indicator (Sharp Square) -->
-    <g transform="translate(182.4, 286.0)">
+    <g transform="translate(182.4, 300.0)">
       <rect x="-3" y="-3" width="6" height="6" fill="#1e293b"/>
       <rect x="-3" y="-3" width="6" height="6" fill="none" stroke="#1e293b" stroke-width="0.8" class="pulse-marker"/>
       <text x="0" y="-10" text-anchor="middle" font-size="9.5" font-weight="600" fill="#0f172a">Peak: 163</text>
@@ -175,80 +222,80 @@
 
     <!-- Timeline Labels -->
     <g font-size="9" font-weight="500" fill="#94a3b8">
-      <text x="42" y="356">W01</text>
-      <text x="221.0" y="356" text-anchor="middle">W13</text>
-      <text x="400.0" y="356" text-anchor="middle">W26</text>
-      <text x="579.0" y="356" text-anchor="middle">W39</text>
-      <text x="758" y="356" text-anchor="end">W52</text>
+      <text x="42" y="370">W01</text>
+      <text x="221.0" y="370" text-anchor="middle">W13</text>
+      <text x="400.0" y="370" text-anchor="middle">W26</text>
+      <text x="579.0" y="370" text-anchor="middle">W39</text>
+      <text x="758" y="370" text-anchor="end">W52</text>
     </g>
   </g>
 
   <!-- ==================== BENTO BLOCK 5: FEATURED PROJECTS ==================== -->
   <g class="fade-in delay-4">
-    <rect x="24" y="380" width="752" height="182" fill="#f8fafc" stroke="#d1d5db" stroke-width="1"/>
+    <rect x="24" y="394" width="752" height="182" fill="#f8fafc" stroke="#d1d5db" stroke-width="1"/>
     
-    <text x="40" y="400" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="#94a3b8">// FEATURED PROJECTS</text>
-    <text x="760" y="400" text-anchor="end" font-size="9" font-weight="500" fill="#94a3b8">Open Source Systems &amp; Tools</text>
-    <line x1="40" y1="408" x2="760" y2="408" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="40" y="414" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="#94a3b8">// FEATURED PROJECTS</text>
+    <text x="760" y="414" text-anchor="end" font-size="9" font-weight="500" fill="#94a3b8">Open Source Systems &amp; Tools</text>
+    <line x1="40" y1="422" x2="760" y2="422" stroke="#e5e7eb" stroke-width="1"/>
     <!-- Project Row 1 -->
     <g>
-      <text x="40" y="435" font-size="12" font-weight="600" fill="#0f172a">[01] twister</text>
-      <text x="180" y="435" font-size="10.5" font-weight="400" fill="#475569">Desktop-agnostic GUI for Linux gaming mice</text>
+      <text x="40" y="449" font-size="12" font-weight="600" fill="#0f172a">[01] twister</text>
+      <text x="180" y="449" font-size="10.5" font-weight="400" fill="#475569">Desktop-agnostic GUI for Linux gaming mice</text>
       
       <!-- Tech Badge -->
-      <rect x="600.0" y="422" width="70.0" height="17" fill="#f1f5f9" stroke="#d1d5db" stroke-width="0.75"/>
-      <text x="635.0" y="434" text-anchor="middle" font-size="8.5" font-weight="500" fill="#94a3b8">TS / Linux</text>
+      <rect x="600.0" y="436" width="70.0" height="17" fill="#f1f5f9" stroke="#d1d5db" stroke-width="0.75"/>
+      <text x="635.0" y="448" text-anchor="middle" font-size="8.5" font-weight="500" fill="#94a3b8">TS / Linux</text>
       
       <!-- Stars -->
-      <text x="756" y="435" text-anchor="end" font-size="9.5" font-weight="600" fill="#0f172a">★ 11</text>
-      <line x1="40" y1="446" x2="760" y2="446" stroke="#e5e7eb" stroke-width="0.75"/>
+      <text x="756" y="449" text-anchor="end" font-size="9.5" font-weight="600" fill="#0f172a">★ 11</text>
+      <line x1="40" y1="460" x2="760" y2="460" stroke="#e5e7eb" stroke-width="0.75"/>
     </g>
     <!-- Project Row 2 -->
     <g>
-      <text x="40" y="471" font-size="12" font-weight="600" fill="#0f172a">[02] neocalc-core</text>
-      <text x="180" y="471" font-size="10.5" font-weight="400" fill="#475569">Rust math engine judging your skills</text>
+      <text x="40" y="485" font-size="12" font-weight="600" fill="#0f172a">[02] neocalc-core</text>
+      <text x="180" y="485" font-size="10.5" font-weight="400" fill="#475569">Rust math engine judging your skills</text>
       
       <!-- Tech Badge -->
-      <rect x="632" y="458" width="38" height="17" fill="#f1f5f9" stroke="#d1d5db" stroke-width="0.75"/>
-      <text x="651.0" y="470" text-anchor="middle" font-size="8.5" font-weight="500" fill="#94a3b8">Rust</text>
+      <rect x="632" y="472" width="38" height="17" fill="#f1f5f9" stroke="#d1d5db" stroke-width="0.75"/>
+      <text x="651.0" y="484" text-anchor="middle" font-size="8.5" font-weight="500" fill="#94a3b8">Rust</text>
       
       <!-- Stars -->
-      <text x="756" y="471" text-anchor="end" font-size="9.5" font-weight="600" fill="#0f172a">★ 1</text>
-      <line x1="40" y1="482" x2="760" y2="482" stroke="#e5e7eb" stroke-width="0.75"/>
+      <text x="756" y="485" text-anchor="end" font-size="9.5" font-weight="600" fill="#0f172a">★ 1</text>
+      <line x1="40" y1="496" x2="760" y2="496" stroke="#e5e7eb" stroke-width="0.75"/>
     </g>
     <!-- Project Row 3 -->
     <g>
-      <text x="40" y="507" font-size="12" font-weight="600" fill="#0f172a">[03] libratbag-rs</text>
-      <text x="180" y="507" font-size="10.5" font-weight="400" fill="#475569">DBus daemon for high-end gaming mice</text>
+      <text x="40" y="521" font-size="12" font-weight="600" fill="#0f172a">[03] libratbag-rs</text>
+      <text x="180" y="521" font-size="10.5" font-weight="400" fill="#475569">DBus daemon for high-end gaming mice</text>
       
       <!-- Tech Badge -->
-      <rect x="594.2" y="494" width="75.8" height="17" fill="#f1f5f9" stroke="#d1d5db" stroke-width="0.75"/>
-      <text x="632.1" y="506" text-anchor="middle" font-size="8.5" font-weight="500" fill="#94a3b8">Rust / DBus</text>
+      <rect x="594.2" y="508" width="75.8" height="17" fill="#f1f5f9" stroke="#d1d5db" stroke-width="0.75"/>
+      <text x="632.1" y="520" text-anchor="middle" font-size="8.5" font-weight="500" fill="#94a3b8">Rust / DBus</text>
       
       <!-- Stars -->
-      <text x="756" y="507" text-anchor="end" font-size="9.5" font-weight="600" fill="#0f172a">★ 1</text>
-      <line x1="40" y1="518" x2="760" y2="518" stroke="#e5e7eb" stroke-width="0.75"/>
+      <text x="756" y="521" text-anchor="end" font-size="9.5" font-weight="600" fill="#0f172a">★ 1</text>
+      <line x1="40" y1="532" x2="760" y2="532" stroke="#e5e7eb" stroke-width="0.75"/>
     </g>
     <!-- Project Row 4 -->
     <g>
-      <text x="40" y="543" font-size="12" font-weight="600" fill="#0f172a">[04] lemurs</text>
-      <text x="180" y="543" font-size="10.5" font-weight="400" fill="#475569">Customizable TUI display &amp; login manager</text>
+      <text x="40" y="557" font-size="12" font-weight="600" fill="#0f172a">[04] lemurs</text>
+      <text x="180" y="557" font-size="10.5" font-weight="400" fill="#475569">Customizable TUI display &amp; login manager</text>
       
       <!-- Tech Badge -->
-      <rect x="600.0" y="530" width="70.0" height="17" fill="#f1f5f9" stroke="#d1d5db" stroke-width="0.75"/>
-      <text x="635.0" y="542" text-anchor="middle" font-size="8.5" font-weight="500" fill="#94a3b8">Rust / TUI</text>
+      <rect x="600.0" y="544" width="70.0" height="17" fill="#f1f5f9" stroke="#d1d5db" stroke-width="0.75"/>
+      <text x="635.0" y="556" text-anchor="middle" font-size="8.5" font-weight="500" fill="#94a3b8">Rust / TUI</text>
       
       <!-- Stars -->
-      <text x="756" y="543" text-anchor="end" font-size="9.5" font-weight="600" fill="#0f172a"></text>
+      <text x="756" y="557" text-anchor="end" font-size="9.5" font-weight="600" fill="#0f172a"></text>
       
     </g>
   </g>
 
   <!-- ==================== FOOTER ==================== -->
   <g class="fade-in delay-4">
-    <line x1="24" y1="574" x2="776" y2="574" stroke="#d1d5db" stroke-width="1"/>
+    <line x1="24" y1="588" x2="776" y2="588" stroke="#d1d5db" stroke-width="1"/>
     
-    <text x="28" y="590" font-size="9.5" font-weight="400" fill="#94a3b8">Universidade Federal de Goiás · Goiás, Brazil · Seeking Employment · Open to Work</text>
-    <text x="772" y="590" text-anchor="end" font-size="9.5" font-weight="400" fill="#94a3b8">Updated via GitHub Actions · SVG Telemetry</text>
+    <text x="28" y="604" font-size="9.5" font-weight="400" fill="#94a3b8">Universidade Federal de Goiás · Goiás, Brazil · Seeking Employment · Open to Work</text>
+    <text x="772" y="604" text-anchor="end" font-size="9.5" font-weight="400" fill="#94a3b8">Updated via GitHub Actions · SVG Telemetry</text>
   </g>
 </svg>

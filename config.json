@@ -7,6 +7,16 @@
   "employment_status": "Seeking Employment · Open to Work",
   "system_env": "x86_64 // ARM64 // Linux & macOS",
   "coordinates": "-16.6869° S, 49.2648° W",
+  "platforms": [
+    { "name": "Linux", "badge": "Kernel · Drivers" },
+    { "name": "macOS", "badge": "Darwin · Systems" },
+    { "name": "Web", "badge": "Wasm · Modern UI" }
+  ],
+  "project_scopes": [
+    { "name": "Drivers & Low-Level", "pct": 45 },
+    { "name": "User Interface / GUI", "pct": 35 },
+    { "name": "Systems & Daemons", "pct": 20 }
+  ],
   "stack_languages": [
     { "name": "Rust", "slug": "rust" },
     { "name": "TypeScript", "slug": "typescript" },
@@ -40,12 +50,6 @@
       "stack": "Rust / TUI",
       "stars": 0
     }
-  ],
-  "focus_languages": [
-    { "name": "Rust", "pct": 42 },
-    { "name": "TypeScript", "pct": 28 },
-    { "name": "Python", "pct": 18 },
-    { "name": "C / Asm", "pct": 12 }
   ],
   "exclude_repos_from_stats": ["winecx", "mesa", "dxmt"]
 }
