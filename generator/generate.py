@@ -121,74 +121,6 @@ def fetch_github_data(username):
         }
     }
 
-def generate_stack_badges_svg(theme="dark", config=None):
-    if config is None:
-        config = {}
-    is_dark = (theme == "dark")
-
-    if is_dark:
-        card_bg = "#111318"
-        border = "#272b35"
-        text_primary = "#f3f4f6"
-        icon_color = "#9ca3af"
-    else:
-        card_bg = "#f8fafc"
-        border = "#d1d5db"
-        text_primary = "#0f172a"
-        icon_color = "#475569"
-
-    stack_langs = config.get("stack_languages", [
-        {"name": "Rust", "slug": "rust"},
-        {"name": "TypeScript", "slug": "typescript"},
-        {"name": "Python", "slug": "python"},
-        {"name": "C", "slug": "c"},
-        {"name": "C++", "slug": "cplusplus"},
-        {"name": "Assembly", "slug": "assemblyscript"}
-    ])[:6]
-
-    total_w = 850
-    h = 32
-
-    badges = []
-    for l in stack_langs:
-        name = l.get("name", "")
-        slug = l.get("slug", "").lower()
-        path_data = LANGUAGE_ICONS.get(slug, LANGUAGE_ICONS.get("rust"))
-        bw = max(76, len(name) * 8 + 42)
-        badges.append((name, slug, path_data, bw))
-
-    gap = 10
-    row_w = sum(b[3] for b in badges) + (len(badges) - 1) * gap
-    start_x = max(0, (total_w - row_w) / 2)
-
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {total_w} {h}" width="100%" height="{h}">
-  <defs>
-    <style>
-      text {{
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", Roboto, Helvetica, Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-      }}
-    </style>
-  </defs>
-  <g>
-"""
-    curr_x = start_x
-    for name, slug, path_data, bw in badges:
-        svg += f"""    <g transform="translate({curr_x:.1f}, 2)">
-      <rect width="{bw}" height="28" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
-      <g transform="translate(10, 7) scale(0.58)">
-        <path d="{path_data}" fill="{icon_color}"/>
-      </g>
-      <text x="32" y="18" font-size="11" font-weight="600" fill="{text_primary}">{xesc(name)}</text>
-    </g>
-"""
-        curr_x += bw + gap
-
-    svg += """  </g>
-</svg>
-"""
-    return svg
-
 def generate_svg(theme="dark", data=None, config=None):
     if config is None:
         config = {}
@@ -385,7 +317,7 @@ def generate_svg(theme="dark", data=None, config=None):
     <!-- Section Title: My Stack -->
     <text x="44" y="165" font-size="10.5" font-weight="600" fill="{text_secondary}">My Stack</text>
 
-    <!-- 6 Stack Languages (Monochrome Representation) -->
+    <!-- 6 Stack Languages (Monochrome Representation with matching C & C++) -->
     <g>
 """
 
@@ -536,20 +468,6 @@ def main():
     with open(light_path, "w", encoding="utf-8") as f:
         f.write(light_svg)
     print(f"Generated light SVG: {light_path}")
-
-    # 3. Dark Mode Stack Badges (On Top)
-    stack_dark_svg = generate_stack_badges_svg(theme="dark", config=config)
-    stack_dark_path = os.path.join(ASSETS_DIR, "stack-badges-dark.svg")
-    with open(stack_dark_path, "w", encoding="utf-8") as f:
-        f.write(stack_dark_svg)
-    print(f"Generated stack badges dark SVG: {stack_dark_path}")
-
-    # 4. Light Mode Stack Badges (On Top)
-    stack_light_svg = generate_stack_badges_svg(theme="light", config=config)
-    stack_light_path = os.path.join(ASSETS_DIR, "stack-badges-light.svg")
-    with open(stack_light_path, "w", encoding="utf-8") as f:
-        f.write(stack_light_svg)
-    print(f"Generated stack badges light SVG: {stack_light_path}")
 
     print("SVG Generation completed successfully!")
 
