@@ -1,3 +1,4 @@
+from pathlib import Path
 #!/usr/bin/env python3
 import json
 import os
@@ -187,7 +188,8 @@ def fetch_github_data(username):
         }
     }
 
-def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
+
+def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
     if config is None:
         config = {}
     if data is None:
@@ -195,7 +197,6 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
 
     is_dark = (theme == "dark")
     
-    # Strictly monochromatic / neutral grayscale palettes (no green, no red)
     if is_dark:
         bg = "#090a0d"
         card_bg = "#111318"
@@ -239,11 +240,11 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
     peak_idx = weekly_counts.index(raw_max) if (weekly_counts and raw_max in weekly_counts) else 0
     max_week = raw_max if raw_max > 0 else 1
 
-    # Mobile portrait activity chart dimensions (344px wide wave)
-    wave_x = 28
-    wave_w = 344
-    wave_y_base = 394
-    wave_y_top = 346
+    # Wide Activity chart dimensions
+    wave_x = 42
+    wave_w = 716
+    wave_y_base = 340
+    wave_y_top = 286
     wave_h = wave_y_base - wave_y_top
 
     points = []
@@ -256,7 +257,6 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
         py = wave_y_base - (normalized * wave_h)
         points.append((px, py))
 
-    # Path construction with clean angular straight segments (sharp angles only)
     path_d = f"M {points[0][0]:.1f} {points[0][1]:.1f}"
     for px, py in points[1:]:
         path_d += f" L {px:.1f} {py:.1f}"
@@ -264,7 +264,6 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
     area_d = path_d + f" L {points[-1][0]:.1f} {wave_y_base} L {points[0][0]:.1f} {wave_y_base} Z"
     peak_x, peak_y = points[peak_idx]
 
-    # 6 Stack Languages
     stack_langs = config.get("stack_languages", [
         {"name": "Rust", "slug": "rust"},
         {"name": "TypeScript", "slug": "typescript"},
@@ -282,11 +281,327 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
     affiliation = xesc(config.get("affiliation", "Universidade Federal de Goiás"))
     location = xesc(config.get("location", "Goiás, Brazil"))
     
-    # Employment Status: Unemployed / Seeking Employment
+    emp_status_raw = config.get("employment_status", "Seeking Employment · Open to Work")
+    employment_status = xesc(emp_status_raw)
+    badge_w = max(220, len(emp_status_raw) * 6.5 + 32)
+    badge_x = 776 - badge_w - 12
+
+    if avatar_data_uri:
+        avatar_svg = f"""      <image href="{avatar_data_uri}" x="36" y="28" width="48" height="48" preserveAspectRatio="xMidYMid slice"/>
+      <rect x="36" y="28" width="48" height="48" fill="none" stroke="{border}" stroke-width="1"/>"""
+    else:
+        avatar_svg = f"""      <rect x="36" y="28" width="48" height="48" fill="{inner_bg}" stroke="{border}" stroke-width="1"/>
+      <text x="60" y="57" text-anchor="middle" font-size="14" font-weight="700" fill="{text_primary}">NP</text>"""
+
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 590" width="100%" height="100%">
+  <defs>
+    <style>
+      text {{
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }}
+
+      .tabular {{
+        font-variant-numeric: tabular-nums;
+      }}
+
+      .draw-stroke {{
+        stroke-dasharray: 3000;
+        stroke-dashoffset: 3000;
+        animation: drawPath 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }}
+
+      .fade-in {{
+        opacity: 0;
+        animation: fadeIn 0.5s ease forwards;
+      }}
+
+      .delay-1 {{ animation-delay: 0.08s; }}
+      .delay-2 {{ animation-delay: 0.16s; }}
+      .delay-3 {{ animation-delay: 0.24s; }}
+      .delay-4 {{ animation-delay: 0.32s; }}
+
+      .pulse-marker {{
+        animation: pulseSquare 2.5s infinite;
+        transform-origin: center;
+      }}
+
+      @keyframes drawPath {{
+        to {{ stroke-dashoffset: 0; }}
+      }}
+
+      @keyframes fadeIn {{
+        from {{ opacity: 0; transform: translateY(3px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
+      }}
+
+      @keyframes pulseSquare {{
+        0%, 100% {{ opacity: 0.2; transform: scale(1); }}
+        50% {{ opacity: 0.9; transform: scale(1.6); }}
+      }}
+    </style>
+
+    <linearGradient id="curveGrad_wide_{theme}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="{accent}" stop-opacity="{accent_fill_opacity * 1.5:.2f}"/>
+      <stop offset="70%" stop-color="{accent}" stop-opacity="{accent_fill_opacity * 0.5:.2f}"/>
+      <stop offset="100%" stop-color="{accent}" stop-opacity="0.0"/>
+    </linearGradient>
+
+    <pattern id="grid_wide_{theme}" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="{border_subtle}" stroke-width="0.5" opacity="0.35"/>
+    </pattern>
+  </defs>
+
+  <rect width="800" height="590" fill="{bg}"/>
+  <rect width="800" height="590" fill="url(#grid_wide_{theme})"/>
+
+  <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
+  <g class="fade-in">
+    <rect x="24" y="16" width="752" height="72" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    
+{avatar_svg}
+
+    <text x="98" y="47" font-size="16" font-weight="700" fill="{text_primary}" letter-spacing="-0.01em">{display_name}</text>
+    <text x="98" y="65" font-size="11" font-weight="400" fill="{text_secondary}">{tagline}</text>
+
+    <!-- Employment Status Badge -->
+    <rect x="{badge_x:.1f}" y="38" width="{badge_w:.1f}" height="28" fill="{inner_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="{badge_x + 10:.1f}" y="48" width="8" height="8" fill="{text_primary}"/>
+    <text x="{badge_x + 24:.1f}" y="56" font-size="10.5" font-weight="600" fill="{text_primary}">{employment_status}</text>
+  </g>
+
+  <!-- ==================== BENTO BLOCK 2: MY STACK ==================== -->
+  <g class="fade-in delay-1">
+    <rect x="24" y="98" width="752" height="58" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <text x="40" y="118" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// MY STACK</text>
+"""
+
+    tile_w = 112
+    tile_h = 26
+    start_x = 40
+    gap = 9
+
+    for idx, lang in enumerate(stack_langs):
+        tx = start_x + idx * (tile_w + gap)
+        ty = 122
+        lname = xesc(lang.get("name", ""))
+        lslug = lang.get("slug", "").lower()
+        path_data = LANGUAGE_ICONS.get(lslug, LANGUAGE_ICONS.get("rust"))
+
+        svg += f"""    <!-- {lname} Tile -->
+    <g transform="translate({tx}, {ty})">
+      <rect width="{tile_w}" height="{tile_h}" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
+      <g transform="translate(8, 4.5) scale(0.65)">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="{path_data}" fill="{text_secondary}"/>
+      </g>
+      <text x="30" y="17" font-size="10.5" font-weight="600" fill="{text_primary}">{lname}</text>
+    </g>
+"""
+
+    svg += f"""  </g>
+
+  <!-- ==================== BENTO BLOCK 3: ENGINEERING METRICS ==================== -->
+  <g class="fade-in delay-2">
+    <rect x="24" y="166" width="752" height="78" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    
+    <text x="40" y="186" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ENGINEERING METRICS</text>
+    <text x="760" y="186" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Linux &amp; macOS // x86_64 &amp; ARM64</text>
+    <line x1="40" y1="194" x2="760" y2="194" stroke="{border_subtle}" stroke-width="1"/>
+
+    <!-- Stat 1: Repositories -->
+    <text x="40" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">REPOSITORIES</text>
+    <text x="40" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_repos}</text>
+
+    <!-- Stat 2: Contributions -->
+    <text x="280" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">YEARLY CONTRIBUTIONS</text>
+    <text x="280" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_contribs}</text>
+
+    <!-- Stat 3: Weekly Peak -->
+    <text x="530" y="210" font-size="8.5" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">WEEKLY ACTIVITY PEAK</text>
+    <text x="530" y="232" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{max_week} <tspan font-size="11" font-weight="400" fill="{text_secondary}">commits / wk</tspan></text>
+  </g>
+
+  <!-- ==================== BENTO BLOCK 4: ACTIVITY RHYTHM ==================== -->
+  <g class="fade-in delay-3">
+    <rect x="24" y="254" width="752" height="116" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    
+    <text x="40" y="274" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// ACTIVITY RHYTHM</text>
+    <text x="760" y="274" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">52-Week Oscilloscope</text>
+
+    <!-- Guide Lines -->
+    <line x1="42" y1="{wave_y_base}" x2="{wave_x + wave_w}" y2="{wave_y_base}" stroke="{border_subtle}" stroke-width="1"/>
+    <line x1="42" y1="{wave_y_top + wave_h/2:.1f}" x2="{wave_x + wave_w}" y2="{wave_y_top + wave_h/2:.1f}" stroke="{border_subtle}" stroke-dasharray="3,4" stroke-width="0.75"/>
+
+    <!-- Gradient Fill -->
+    <path d="{area_d}" fill="url(#curveGrad_wide_{theme})"/>
+
+    <!-- Sharp Angular Trajectory Stroke -->
+    <path class="draw-stroke" d="{path_d}" fill="none" stroke="{accent_stroke}" stroke-width="1.6" stroke-linejoin="miter"/>
+
+    <!-- Peak Indicator (Sharp Square) -->
+    <g transform="translate({peak_x:.1f}, {peak_y:.1f})">
+      <rect x="-3" y="-3" width="6" height="6" fill="{accent_stroke}"/>
+      <rect x="-3" y="-3" width="6" height="6" fill="none" stroke="{accent_stroke}" stroke-width="0.8" class="pulse-marker"/>
+      <text x="0" y="-10" text-anchor="middle" font-size="9.5" font-weight="600" fill="{text_primary}">Peak: {max_week}</text>
+    </g>
+
+    <!-- Timeline Labels -->
+    <g font-size="9" font-weight="500" fill="{text_tertiary}">
+      <text x="{wave_x}" y="356">W01</text>
+      <text x="{wave_x + wave_w*0.25:.1f}" y="356" text-anchor="middle">W13</text>
+      <text x="{wave_x + wave_w*0.5:.1f}" y="356" text-anchor="middle">W26</text>
+      <text x="{wave_x + wave_w*0.75:.1f}" y="356" text-anchor="middle">W39</text>
+      <text x="{wave_x + wave_w}" y="356" text-anchor="end">W52</text>
+    </g>
+  </g>
+
+  <!-- ==================== BENTO BLOCK 5: FEATURED PROJECTS ==================== -->
+  <g class="fade-in delay-4">
+    <rect x="24" y="380" width="752" height="164" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    
+    <text x="40" y="400" font-size="9.5" font-weight="700" letter-spacing="0.08em" fill="{text_tertiary}">// FEATURED PROJECTS</text>
+    <text x="760" y="400" text-anchor="end" font-size="9" font-weight="500" fill="{text_tertiary}">Open Source Systems &amp; Tools</text>
+    <line x1="40" y1="408" x2="760" y2="408" stroke="{border_subtle}" stroke-width="1"/>
+"""
+
+    row_ys = [416, 448, 480, 512]
+
+    for idx, repo in enumerate(featured):
+        if idx >= len(row_ys):
+            break
+        ry = row_ys[idx]
+        r_name = xesc(repo.get("name", ""))
+        r_desc = xesc(repo.get("desc", ""))
+        r_stack = xesc(repo.get("stack", ""))
+        r_stars = repo.get("stars", 0)
+
+        star_str = f"★ {r_stars}" if r_stars > 0 else ""
+        tag_w = max(38, len(r_stack) * 5.8 + 12)
+
+        div_line = f"""<line x1="40" y1="{ry + 26}" x2="760" y2="{ry + 26}" stroke="{border_subtle}" stroke-width="0.75"/>""" if idx < 3 else ""
+
+        svg += f"""    <!-- Project Row {idx + 1} -->
+    <g>
+      <text x="40" y="{ry + 17}" font-size="11.5" font-weight="600" fill="{text_primary}">[{idx + 1:02d}] {r_name}</text>
+      <text x="180" y="{ry + 17}" font-size="10.5" font-weight="400" fill="{text_secondary}">{r_desc}</text>
+      
+      <!-- Tech Badge -->
+      <rect x="{670 - tag_w}" y="{ry + 4}" width="{tag_w}" height="17" fill="{inner_bg}" stroke="{border}" stroke-width="0.75"/>
+      <text x="{670 - tag_w/2}" y="{ry + 16}" text-anchor="middle" font-size="8.5" font-weight="500" fill="{text_tertiary}">{r_stack}</text>
+      
+      <!-- Stars -->
+      <text x="756" y="{ry + 17}" text-anchor="end" font-size="9.5" font-weight="600" fill="{text_primary}">{star_str}</text>
+      {div_line}
+    </g>
+"""
+
+    svg += f"""  </g>
+
+  <!-- ==================== FOOTER ==================== -->
+  <g class="fade-in delay-4">
+    <line x1="24" y1="556" x2="776" y2="556" stroke="{border}" stroke-width="1"/>
+    
+    <text x="28" y="572" font-size="9.5" font-weight="400" fill="{text_tertiary}">{affiliation} · {location} · {employment_status}</text>
+    <text x="772" y="572" text-anchor="end" font-size="9.5" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
+  </g>
+</svg>
+"""
+    return svg
+
+def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=""):
+    if config is None:
+        config = {}
+    if data is None:
+        data = {}
+
+    is_dark = (theme == "dark")
+    
+    if is_dark:
+        bg = "#090a0d"
+        card_bg = "#111318"
+        inner_bg = "#181b22"
+        border = "#272b35"
+        border_subtle = "#1c2028"
+        text_primary = "#f3f4f6"
+        text_secondary = "#9ca3af"
+        text_tertiary = "#6b7280"
+        accent = "#ffffff"
+        accent_stroke = "#e5e7eb"
+        accent_fill_opacity = 0.12
+    else:
+        bg = "#ffffff"
+        card_bg = "#f8fafc"
+        inner_bg = "#f1f5f9"
+        border = "#d1d5db"
+        border_subtle = "#e5e7eb"
+        text_primary = "#0f172a"
+        text_secondary = "#475569"
+        text_tertiary = "#94a3b8"
+        accent = "#0f172a"
+        accent_stroke = "#1e293b"
+        accent_fill_opacity = 0.08
+
+    total_repos = data.get("repositories", {}).get("totalCount", 30)
+    cal = data.get("contributionsCollection", {}).get("contributionCalendar", {})
+    total_contribs = cal.get("totalContributions", 963)
+    weeks = cal.get("weeks", [])
+    
+    weekly_counts = []
+    for w in weeks:
+        weekly_counts.append(sum(d.get("contributionCount", 0) for d in w.get("contributionDays", [])))
+    
+    if len(weekly_counts) > 52:
+        weekly_counts = weekly_counts[-52:]
+    elif len(weekly_counts) < 52:
+        weekly_counts = [0] * (52 - len(weekly_counts)) + weekly_counts
+
+    raw_max = max(weekly_counts) if weekly_counts else 0
+    peak_idx = weekly_counts.index(raw_max) if (weekly_counts and raw_max in weekly_counts) else 0
+    max_week = raw_max if raw_max > 0 else 1
+
+    wave_x = 28
+    wave_w = 344
+    wave_y_base = 394
+    wave_y_top = 346
+    wave_h = wave_y_base - wave_y_top
+
+    points = []
+    n = len(weekly_counts)
+    step = wave_w / (n - 1) if n > 1 else wave_w
+
+    for i, count in enumerate(weekly_counts):
+        px = wave_x + i * step
+        normalized = count / max_week if max_week > 0 else 0
+        py = wave_y_base - (normalized * wave_h)
+        points.append((px, py))
+
+    path_d = f"M {points[0][0]:.1f} {points[0][1]:.1f}"
+    for px, py in points[1:]:
+        path_d += f" L {px:.1f} {py:.1f}"
+
+    area_d = path_d + f" L {points[-1][0]:.1f} {wave_y_base} L {points[0][0]:.1f} {wave_y_base} Z"
+    peak_x, peak_y = points[peak_idx]
+
+    stack_langs = config.get("stack_languages", [
+        {"name": "Rust", "slug": "rust"},
+        {"name": "TypeScript", "slug": "typescript"},
+        {"name": "Python", "slug": "python"},
+        {"name": "C", "slug": "c"},
+        {"name": "C++", "slug": "cplusplus"},
+        {"name": "Assembly", "slug": "assemblyscript"}
+    ])[:6]
+
+    featured = config.get("featured_repos", [])[:4]
+    
+    raw_name = config.get("name", "Nilton Perim Neto")
+    display_name = xesc(raw_name.title() if raw_name.isupper() else raw_name)
+    tagline = xesc(config.get("tagline", "Not a Programmer, just a historian."))
+    affiliation = xesc(config.get("affiliation", "Universidade Federal de Goiás"))
+    location = xesc(config.get("location", "Goiás, Brazil"))
+    
     emp_status_raw = config.get("employment_status", "Seeking Employment · Open to Work")
     employment_status = xesc(emp_status_raw)
 
-    # Avatar image embedding or monogram fallback
     if avatar_data_uri:
         avatar_svg = f"""      <image href="{avatar_data_uri}" x="28" y="28" width="44" height="44" preserveAspectRatio="xMidYMid slice"/>
       <rect x="28" y="28" width="44" height="44" fill="none" stroke="{border}" stroke-width="1"/>"""
@@ -294,7 +609,6 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
         avatar_svg = f"""      <rect x="28" y="28" width="44" height="44" fill="{inner_bg}" stroke="{border}" stroke-width="1"/>
       <text x="50" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="{text_primary}">NP</text>"""
 
-    # Mobile portrait bento layout: 400 x 660 (strictly sharp angles, strictly monochromatic, stacked full-width blocks)
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 660" width="100%" height="100%">
   <defs>
     <style>
@@ -343,31 +657,26 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
       }}
     </style>
 
-    <!-- Linear Gradients for Activity Rhythm Fill -->
-    <linearGradient id="curveGrad_{theme}" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="curveGrad_portrait_{theme}" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="{accent}" stop-opacity="{accent_fill_opacity * 1.5:.2f}"/>
       <stop offset="70%" stop-color="{accent}" stop-opacity="{accent_fill_opacity * 0.5:.2f}"/>
       <stop offset="100%" stop-color="{accent}" stop-opacity="0.0"/>
     </linearGradient>
 
-    <!-- Subtle Grid Background Pattern (sharp orthogonal grid) -->
-    <pattern id="grid_{theme}" width="20" height="20" patternUnits="userSpaceOnUse">
+    <pattern id="grid_portrait_{theme}" width="20" height="20" patternUnits="userSpaceOnUse">
       <path d="M 20 0 L 0 0 0 20" fill="none" stroke="{border_subtle}" stroke-width="0.5" opacity="0.35"/>
     </pattern>
   </defs>
 
-  <!-- Background Canvas -->
   <rect width="400" height="660" fill="{bg}"/>
-  <rect width="400" height="660" fill="url(#grid_{theme})"/>
+  <rect width="400" height="660" fill="url(#grid_portrait_{theme})"/>
 
   <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
     <rect x="16" y="16" width="368" height="94" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
     
-    <!-- User Avatar -->
 {avatar_svg}
 
-    <!-- Name & Tagline -->
     <text x="82" y="44" font-size="14.5" font-weight="700" fill="{text_primary}" letter-spacing="-0.01em">{display_name}</text>
     <text x="82" y="60" font-size="10" font-weight="400" fill="{text_secondary}">{tagline}</text>
 
@@ -445,7 +754,7 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
     <line x1="{wave_x}" y1="{wave_y_top + wave_h/2:.1f}" x2="{wave_x + wave_w}" y2="{wave_y_top + wave_h/2:.1f}" stroke="{border_subtle}" stroke-dasharray="3,4" stroke-width="0.75"/>
 
     <!-- Gradient Fill -->
-    <path d="{area_d}" fill="url(#curveGrad_{theme})"/>
+    <path d="{area_d}" fill="url(#curveGrad_portrait_{theme})"/>
 
     <!-- Sharp Angular Trajectory Stroke -->
     <path class="draw-stroke" d="{path_d}" fill="none" stroke="{accent_stroke}" stroke-width="1.5" stroke-linejoin="miter"/>
@@ -492,7 +801,6 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
         star_offset = 28 if r_stars > 0 else 0
         tag_x = 372 - star_offset - tag_w
 
-        # Subtle row divider
         div_line = f"""<line x1="28" y1="{ry + 32}" x2="372" y2="{ry + 32}" stroke="{border_subtle}" stroke-width="0.5"/>""" if idx < 3 else ""
 
         svg += f"""    <!-- Project Row {idx + 1} -->
@@ -526,32 +834,41 @@ def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
 """
     return svg
 
+def generate_svg(theme="dark", data=None, config=None, avatar_data_uri=""):
+    # Default to wide
+    return generate_svg_wide(theme, data, config, avatar_data_uri)
+
 def main():
     config = load_config()
     username = config.get("username", "niltonperimneto")
-    
+
     print(f"Fetching GitHub data for {username}...")
     data = fetch_github_data(username)
-    
-    avatar_url = data.get("avatarUrl", "https://avatars.githubusercontent.com/u/118851240?v=4")
+
+    avatar_url = data.get("avatarUrl") or config.get("avatar_url") or "https://avatars.githubusercontent.com/u/118851240?v=4"
     print(f"Fetching avatar from {avatar_url}...")
     avatar_data_uri = fetch_avatar_data_uri(avatar_url)
-    
-    os.makedirs(ASSETS_DIR, exist_ok=True)
-    
-    dark_svg = generate_svg(theme="dark", data=data, config=config, avatar_data_uri=avatar_data_uri)
-    dark_path = os.path.join(ASSETS_DIR, "zed-card-dark.svg")
-    with open(dark_path, "w", encoding="utf-8") as f:
-        f.write(dark_svg)
-    print(f"Generated dark SVG: {dark_path}")
-    
-    light_svg = generate_svg(theme="light", data=data, config=config, avatar_data_uri=avatar_data_uri)
-    light_path = os.path.join(ASSETS_DIR, "zed-card-light.svg")
-    with open(light_path, "w", encoding="utf-8") as f:
-        f.write(light_svg)
-    print(f"Generated light SVG: {light_path}")
-    
-    print("SVG Generation completed successfully!")
+
+    out_dir = Path(__file__).resolve().parent.parent / "assets"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # 1. Wide Cards (Desktop / >= 600px)
+    wide_dark = generate_svg_wide("dark", data=data, config=config, avatar_data_uri=avatar_data_uri)
+    wide_light = generate_svg_wide("light", data=data, config=config, avatar_data_uri=avatar_data_uri)
+    (out_dir / "zed-card-wide-dark.svg").write_text(wide_dark, encoding="utf-8")
+    (out_dir / "zed-card-wide-light.svg").write_text(wide_light, encoding="utf-8")
+
+    # 2. Portrait Cards (Mobile / < 600px)
+    portrait_dark = generate_svg_portrait("dark", data=data, config=config, avatar_data_uri=avatar_data_uri)
+    portrait_light = generate_svg_portrait("light", data=data, config=config, avatar_data_uri=avatar_data_uri)
+    (out_dir / "zed-card-portrait-dark.svg").write_text(portrait_dark, encoding="utf-8")
+    (out_dir / "zed-card-portrait-light.svg").write_text(portrait_light, encoding="utf-8")
+
+    # 3. Standard Fallbacks
+    (out_dir / "zed-card-dark.svg").write_text(wide_dark, encoding="utf-8")
+    (out_dir / "zed-card-light.svg").write_text(wide_light, encoding="utf-8")
+
+    print("All wide and portrait SVG assets generated successfully!")
 
 if __name__ == "__main__":
     main()
