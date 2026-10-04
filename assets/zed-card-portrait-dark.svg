@@ -59,6 +59,7 @@
 
   <rect width="400" height="680" fill="#090a0d"/>
   <rect width="400" height="680" fill="url(#grid_portrait_dark)"/>
+  <rect x="0.5" y="0.5" width="399" height="679" fill="none" stroke="#272b35" stroke-width="1"/>
 
   <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
@@ -186,14 +187,14 @@
     <!-- Scope Item: UI / GUI -->
     <g>
       <rect x="222" y="280" width="6" height="6" fill="#9ca3af"/>
-      <text x="232" y="286" font-size="8" font-weight="600" fill="#9ca3af">UI / GUI</text>
-      <text x="372" y="286" text-anchor="end" font-size="8.5" font-weight="700" fill="#9ca3af" class="tabular">35%</text>
+      <text x="232" y="286" font-size="8" font-weight="600" fill="#f3f4f6">UI / GUI</text>
+      <text x="372" y="286" text-anchor="end" font-size="8.5" font-weight="700" fill="#f3f4f6" class="tabular">35%</text>
     </g>
     <!-- Scope Item: Systems -->
     <g>
       <rect x="222" y="294" width="6" height="6" fill="#4b5563"/>
-      <text x="232" y="300" font-size="8" font-weight="600" fill="#6b7280">Systems</text>
-      <text x="372" y="300" text-anchor="end" font-size="8.5" font-weight="700" fill="#6b7280" class="tabular">20%</text>
+      <text x="232" y="300" font-size="8" font-weight="600" fill="#f3f4f6">Systems</text>
+      <text x="372" y="300" text-anchor="end" font-size="8.5" font-weight="700" fill="#f3f4f6" class="tabular">20%</text>
     </g>
   </g>
 

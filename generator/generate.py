@@ -48,7 +48,7 @@ def generate_pie_chart_svg(cx, cy, r, slices, is_dark, card_bg, border):
     if is_dark:
         colors = ["#f3f4f6", "#9ca3af", "#4b5563", "#374151"]
     else:
-        colors = ["#1e293b", "#64748b", "#cbd5e1", "#e2e8f0"]
+        colors = ["#0f172a", "#475569", "#94a3b8", "#cbd5e1"]
 
     start_angle = -math.pi / 2  # 12 o'clock
     svg_paths = []
@@ -365,6 +365,7 @@ def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
 
   <rect width="800" height="600" fill="{bg}"/>
   <rect width="800" height="600" fill="url(#grid_wide_{theme})"/>
+  <rect x="0.5" y="0.5" width="799" height="599" fill="none" stroke="{border}" stroke-width="1"/>
 
   <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
@@ -457,8 +458,8 @@ def generate_svg_wide(theme="dark", data=None, config=None, avatar_data_uri=""):
     </g>
 """
 
-    legend_colors = ["#f3f4f6", "#9ca3af", "#4b5563"] if is_dark else ["#1e293b", "#64748b", "#cbd5e1"]
-    legend_text_colors = [text_primary, text_secondary, text_tertiary]
+    legend_colors = ["#f3f4f6", "#9ca3af", "#4b5563"] if is_dark else ["#0f172a", "#475569", "#94a3b8"]
+    legend_text_colors = [text_primary, text_secondary, text_tertiary] if is_dark else [text_primary, text_primary, text_primary]
     legend_ys = [222, 234, 246]
 
     for idx, s in enumerate(project_scopes):
@@ -745,6 +746,7 @@ def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=
 
   <rect width="400" height="680" fill="{bg}"/>
   <rect width="400" height="680" fill="url(#grid_portrait_{theme})"/>
+  <rect x="0.5" y="0.5" width="399" height="679" fill="none" stroke="{border}" stroke-width="1"/>
 
   <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
@@ -837,8 +839,7 @@ def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=
     </g>
 """
 
-    legend_colors = ["#f3f4f6", "#9ca3af", "#4b5563"] if is_dark else ["#1e293b", "#64748b", "#cbd5e1"]
-    legend_text_colors = [text_primary, text_secondary, text_tertiary]
+    legend_colors = ["#f3f4f6", "#9ca3af", "#4b5563"] if is_dark else ["#0f172a", "#475569", "#94a3b8"]
     short_names = ["Drivers", "UI / GUI", "Systems"]
     legend_ys = [272, 286, 300]
 
@@ -849,13 +850,12 @@ def generate_svg_portrait(theme="dark", data=None, config=None, avatar_data_uri=
         s_name = xesc(short_names[idx] if idx < len(short_names) else s.get("name", ""))
         s_pct = s.get("pct", 0)
         swatch_c = legend_colors[idx % len(legend_colors)]
-        t_color = legend_text_colors[idx % len(legend_text_colors)]
 
         svg += f"""    <!-- Scope Item: {s_name} -->
     <g>
       <rect x="222" y="{ly - 6}" width="6" height="6" fill="{swatch_c}"/>
-      <text x="232" y="{ly}" font-size="8" font-weight="600" fill="{t_color}">{s_name}</text>
-      <text x="372" y="{ly}" text-anchor="end" font-size="8.5" font-weight="700" fill="{t_color}" class="tabular">{s_pct}%</text>
+      <text x="232" y="{ly}" font-size="8" font-weight="600" fill="{text_primary}">{s_name}</text>
+      <text x="372" y="{ly}" text-anchor="end" font-size="8.5" font-weight="700" fill="{text_primary}" class="tabular">{s_pct}%</text>
     </g>
 """
 

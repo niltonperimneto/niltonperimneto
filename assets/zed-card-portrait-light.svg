@@ -59,6 +59,7 @@
 
   <rect width="400" height="680" fill="#ffffff"/>
   <rect width="400" height="680" fill="url(#grid_portrait_light)"/>
+  <rect x="0.5" y="0.5" width="399" height="679" fill="none" stroke="#d1d5db" stroke-width="1"/>
 
   <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
@@ -171,29 +172,29 @@
 
     <!-- Pizza Graphics (Pie Chart) -->
     <g>
-    <path d="M 196.00 284.00 L 196.00 268.00 A 16.00 16.00 0 0 1 200.94 299.22 Z" fill="#1e293b" stroke="#f8fafc" stroke-width="1.5"/>
-    <path d="M 196.00 284.00 L 200.94 299.22 A 16.00 16.00 0 0 1 180.78 279.06 Z" fill="#64748b" stroke="#f8fafc" stroke-width="1.5"/>
-    <path d="M 196.00 284.00 L 180.78 279.06 A 16.00 16.00 0 0 1 196.00 268.00 Z" fill="#cbd5e1" stroke="#f8fafc" stroke-width="1.5"/>
+    <path d="M 196.00 284.00 L 196.00 268.00 A 16.00 16.00 0 0 1 200.94 299.22 Z" fill="#0f172a" stroke="#f8fafc" stroke-width="1.5"/>
+    <path d="M 196.00 284.00 L 200.94 299.22 A 16.00 16.00 0 0 1 180.78 279.06 Z" fill="#475569" stroke="#f8fafc" stroke-width="1.5"/>
+    <path d="M 196.00 284.00 L 180.78 279.06 A 16.00 16.00 0 0 1 196.00 268.00 Z" fill="#94a3b8" stroke="#f8fafc" stroke-width="1.5"/>
     <circle cx="196.00" cy="284.00" r="16.00" fill="none" stroke="#d1d5db" stroke-width="0.75"/>
     <circle cx="196.00" cy="284.00" r="2.2" fill="#f8fafc" stroke="#d1d5db" stroke-width="0.75"/>
     </g>
     <!-- Scope Item: Drivers -->
     <g>
-      <rect x="222" y="266" width="6" height="6" fill="#1e293b"/>
+      <rect x="222" y="266" width="6" height="6" fill="#0f172a"/>
       <text x="232" y="272" font-size="8" font-weight="600" fill="#0f172a">Drivers</text>
       <text x="372" y="272" text-anchor="end" font-size="8.5" font-weight="700" fill="#0f172a" class="tabular">45%</text>
     </g>
     <!-- Scope Item: UI / GUI -->
     <g>
-      <rect x="222" y="280" width="6" height="6" fill="#64748b"/>
-      <text x="232" y="286" font-size="8" font-weight="600" fill="#475569">UI / GUI</text>
-      <text x="372" y="286" text-anchor="end" font-size="8.5" font-weight="700" fill="#475569" class="tabular">35%</text>
+      <rect x="222" y="280" width="6" height="6" fill="#475569"/>
+      <text x="232" y="286" font-size="8" font-weight="600" fill="#0f172a">UI / GUI</text>
+      <text x="372" y="286" text-anchor="end" font-size="8.5" font-weight="700" fill="#0f172a" class="tabular">35%</text>
     </g>
     <!-- Scope Item: Systems -->
     <g>
-      <rect x="222" y="294" width="6" height="6" fill="#cbd5e1"/>
-      <text x="232" y="300" font-size="8" font-weight="600" fill="#94a3b8">Systems</text>
-      <text x="372" y="300" text-anchor="end" font-size="8.5" font-weight="700" fill="#94a3b8" class="tabular">20%</text>
+      <rect x="222" y="294" width="6" height="6" fill="#94a3b8"/>
+      <text x="232" y="300" font-size="8" font-weight="600" fill="#0f172a">Systems</text>
+      <text x="372" y="300" text-anchor="end" font-size="8.5" font-weight="700" fill="#0f172a" class="tabular">20%</text>
     </g>
   </g>
 

@@ -59,6 +59,7 @@
 
   <rect width="800" height="600" fill="#090a0d"/>
   <rect width="800" height="600" fill="url(#grid_wide_dark)"/>
+  <rect x="0.5" y="0.5" width="799" height="599" fill="none" stroke="#272b35" stroke-width="1"/>
 
   <!-- ==================== BENTO BLOCK 1: PROFILE HEADER ==================== -->
   <g class="fade-in">
