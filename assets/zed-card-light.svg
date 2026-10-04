@@ -1,226 +1,216 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 370" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 380" width="100%" height="100%">
   <defs>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap');
-      
       text {
-        font-family: 'JetBrains Mono', 'SF Mono', Monaco, Menlo, Consolas, monospace;
-        letter-spacing: 0.04em;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .tabular {
+        font-variant-numeric: tabular-nums;
       }
 
       .draw-stroke {
-        stroke-dasharray: 1800;
-        stroke-dashoffset: 1800;
-        animation: drawPath 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        stroke-dasharray: 2000;
+        stroke-dashoffset: 2000;
+        animation: drawPath 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
 
       .fade-in {
         opacity: 0;
-        animation: fadeIn 0.8s ease forwards;
+        animation: fadeIn 0.6s ease forwards;
       }
 
-      .delay-1 { animation-delay: 0.25s; }
-      .delay-2 { animation-delay: 0.5s; }
-      .delay-3 { animation-delay: 0.75s; }
+      .delay-1 { animation-delay: 0.15s; }
+      .delay-2 { animation-delay: 0.3s; }
+      .delay-3 { animation-delay: 0.45s; }
 
       .pulse-marker {
-        animation: pulse 2.2s infinite ease-in-out;
-      }
-
-      .cursor {
-        animation: blink 1s step-end infinite;
-      }
-
-      .scan-line {
-        animation: scan 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        animation: pulse 2.4s infinite ease-in-out;
       }
 
       @keyframes drawPath {
-        to {
-          stroke-dashoffset: 0;
-        }
+        to { stroke-dashoffset: 0; }
       }
 
       @keyframes fadeIn {
-        to {
-          opacity: 1;
-        }
+        to { opacity: 1; }
       }
 
       @keyframes pulse {
         0%, 100% { r: 3; opacity: 1; }
-        50% { r: 6.5; opacity: 0.25; }
-      }
-
-      @keyframes blink {
-        0%, 49% { opacity: 1; }
-        50%, 100% { opacity: 0; }
-      }
-
-      @keyframes scan {
-        0% { transform: translateX(0px); opacity: 0; }
-        12% { opacity: 0.6; }
-        88% { opacity: 0.6; }
-        100% { transform: translateX(385px); opacity: 0; }
+        50% { r: 5.5; opacity: 0.3; }
       }
     </style>
 
-    <linearGradient id="areaGrad_light" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#09090b" stop-opacity="0.07"/>
-      <stop offset="100%" stop-color="#09090b" stop-opacity="0.0"/>
+    <linearGradient id="curveGrad_light" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1f2328" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#1f2328" stop-opacity="0.0"/>
     </linearGradient>
 
-    <pattern id="gridPattern_light" width="20" height="20" patternUnits="userSpaceOnUse">
-      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f4f4f6" stroke-width="0.75"/>
-    </pattern>
+    <clipPath id="langBarClip">
+      <rect x="44" y="184" width="328" height="7" rx="3.5"/>
+    </clipPath>
   </defs>
 
-  <!-- Outer Frame -->
-  <rect width="850" height="370" fill="#ffffff" rx="6"/>
-  <rect x="0.5" y="0.5" width="849" height="369" fill="none" stroke="#e4e4e7" stroke-width="1" rx="5.5"/>
-
-  <!-- Precision Corner Crosshairs (+) -->
-  <path d="M 7 13 L 19 13 M 13 7 L 13 19" stroke="#d4d4d8" stroke-width="1"/>
-  <path d="M 831 13 L 843 13 M 837 7 L 837 19" stroke="#d4d4d8" stroke-width="1"/>
-  <path d="M 7 357 L 19 357 M 13 351 L 13 363" stroke="#d4d4d8" stroke-width="1"/>
-  <path d="M 831 357 L 843 357 M 837 351 L 837 363" stroke="#d4d4d8" stroke-width="1"/>
+  <!-- Card Background -->
+  <rect width="850" height="380" fill="#ffffff" rx="12"/>
+  <rect x="0.5" y="0.5" width="849" height="379" fill="none" stroke="#d0d7de" stroke-width="1" rx="11.5"/>
 
   <!-- ==================== HEADER ==================== -->
   <g class="fade-in">
-    <line x1="24" y1="46" x2="826" y2="46" stroke="#e4e4e7" stroke-width="1"/>
-    <text x="28" y="32" font-size="11.5" font-weight="700" fill="#09090b">[ 01 // NILTON PERIM NETO ]</text>
-    <text x="245" y="32" font-size="10" font-weight="400" fill="#52525b">Not a Programmer, just a historian.</text>
-    
-    <rect x="674" y="20" width="152" height="18" fill="#f4f4f5" stroke="#d4d4d8" stroke-width="0.8" rx="2"/>
-    <circle cx="686" cy="29" r="3" fill="#09090b"/>
-    <text x="696" y="33" font-size="9" font-weight="500" fill="#09090b">SYS.TELEMETRY // NOMINAL</text>
+    <!-- Monogram Circle -->
+    <circle cx="44" cy="38" r="16" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+    <text x="44" y="42" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2328">NP</text>
+
+    <!-- Name & Tagline -->
+    <text x="70" y="34" font-size="16" font-weight="600" fill="#1f2328" letter-spacing="-0.01em">Nilton Perim Neto</text>
+    <text x="70" y="50" font-size="11.5" font-weight="400" fill="#57606a">Not a Programmer, just a historian.</text>
+
+    <!-- Status Badge -->
+    <rect x="636" y="24" width="190" height="28" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1" rx="14"/>
+    <circle cx="652" cy="38" r="3.5" fill="#1a7f37"/>
+    <text x="664" y="42" font-size="11" font-weight="500" fill="#57606a">Systems &amp; Open Source</text>
+
+    <!-- Header Divider -->
+    <line x1="24" y1="72" x2="826" y2="72" stroke="#d0d7de" stroke-width="1"/>
   </g>
 
-  <!-- ==================== TELEMETRY MATRIX ==================== -->
+  <!-- ==================== METRICS & LANGUAGES ==================== -->
   <g class="fade-in delay-1">
-    <rect x="24" y="60" width="365" height="152" fill="#fafafa" stroke="#e4e4e7" stroke-width="1" rx="3"/>
-    
-    <path d="M 24 82 L 389 82" stroke="#e4e4e7" stroke-width="1"/>
-    <text x="36" y="76" font-size="9.5" font-weight="700" fill="#a1a1aa">// TELEMETRY_MATRIX</text>
-    <text x="325" y="76" font-size="8.5" fill="#a1a1aa">[SYS.STAT]</text>
+    <!-- Panel Container -->
+    <rect x="24" y="86" width="368" height="148" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1" rx="10"/>
 
-    <g font-size="10" fill="#52525b">
-      <text x="36" y="104">REPOSITORIES</text>
-      <line x1="130" y1="102" x2="330" y2="102" stroke="#e4e4e7" stroke-dasharray="2,4" stroke-width="0.8"/>
-      <text x="375" y="104" text-anchor="end" font-weight="700" fill="#09090b">30</text>
+    <!-- Stat 1: Repositories -->
+    <text x="44" y="110" font-size="9" font-weight="600" letter-spacing="0.06em" fill="#8c959f">REPOSITORIES</text>
+    <text x="44" y="136" font-size="20" font-weight="600" fill="#1f2328" class="tabular">30</text>
 
-      <text x="36" y="124">CONTRIBUTIONS (365D)</text>
-      <line x1="172" y1="122" x2="330" y2="122" stroke="#e4e4e7" stroke-dasharray="2,4" stroke-width="0.8"/>
-      <text x="375" y="124" text-anchor="end" font-weight="700" fill="#09090b">963</text>
+    <!-- Stat 2: Contributions -->
+    <text x="168" y="110" font-size="9" font-weight="600" letter-spacing="0.06em" fill="#8c959f">YEARLY COMMITS</text>
+    <text x="168" y="136" font-size="20" font-weight="600" fill="#1f2328" class="tabular">963</text>
 
-      <text x="36" y="144">ACTIVITY PEAK</text>
-      <line x1="135" y1="142" x2="310" y2="142" stroke="#e4e4e7" stroke-dasharray="2,4" stroke-width="0.8"/>
-      <text x="375" y="144" text-anchor="end" font-weight="700" fill="#09090b">163 / WEEK</text>
+    <!-- Stat 3: Peak Activity -->
+    <text x="292" y="110" font-size="9" font-weight="600" letter-spacing="0.06em" fill="#8c959f">WEEKLY PEAK</text>
+    <text x="292" y="136" font-size="20" font-weight="600" fill="#1f2328" class="tabular">163</text>
+
+    <!-- Sub-divider -->
+    <line x1="44" y1="152" x2="372" y2="152" stroke="#e1e4e8" stroke-width="1"/>
+
+    <!-- Languages Header -->
+    <text x="44" y="174" font-size="11" font-weight="600" fill="#57606a">Primary Languages</text>
+
+    <!-- Multi-segment Rounded Bar -->
+    <g clip-path="url(#langBarClip)">
+      <rect x="44" y="184" width="137.8" height="7" fill="#1f2328"/>
+      <rect x="181.76" y="184" width="91.8" height="7" fill="#57606a"/>
+      <rect x="273.6" y="184" width="59.0" height="7" fill="#8c959f"/>
+      <rect x="332.64000000000004" y="184" width="39.4" height="7" fill="#d0d7de"/>
     </g>
 
-    <text x="36" y="171" font-size="9" font-weight="700" fill="#a1a1aa">// STACK_GAUGE</text>
-    
-    <!-- Hairline Segment Bar -->
-    <rect x="46" y="181" width="325" height="4" fill="#f4f4f5" stroke="#e4e4e7" stroke-width="0.8"/>
-    <rect x="46" y="181" width="135.5" height="4" fill="#09090b" opacity="0.85"/>
-    <rect x="182.5" y="181" width="90.0" height="4" fill="#09090b" opacity="0.85"/>
-    <rect x="273.5" y="181" width="57.5" height="4" fill="#09090b" opacity="0.85"/>
-    <rect x="332.0" y="181" width="38.0" height="4" fill="#09090b" opacity="0.85"/>
-    <g font-size="8.5" fill="#52525b">
-      <text x="46" y="198">RUST 42%</text>
-      <text x="145" y="198">TYPESCRIPT 28%</text>
-      <text x="235" y="198">PYTHON 18%</text>
-      <text x="325" y="198">C / ASM 12%</text>
+    <!-- Language Legend -->
+    <g font-size="10" font-weight="500" fill="{text_secondary}">
+      <circle cx="44" cy="211" r="3" fill="#1f2328"/>
+      <text x="52" y="215" fill="#57606a">Rust <tspan font-weight="400" fill="#8c959f">42%</tspan></text>
+      <circle cx="130" cy="211" r="3" fill="#57606a"/>
+      <text x="138" y="215" fill="#57606a">TypeScript <tspan font-weight="400" fill="#8c959f">28%</tspan></text>
+      <circle cx="230" cy="211" r="3" fill="#8c959f"/>
+      <text x="238" y="215" fill="#57606a">Python <tspan font-weight="400" fill="#8c959f">18%</tspan></text>
+      <circle cx="310" cy="211" r="3" fill="#d0d7de"/>
+      <text x="318" y="215" fill="#57606a">C / Asm <tspan font-weight="400" fill="#8c959f">12%</tspan></text>
     </g>
   </g>
 
-  <!-- ==================== OSCILLOSCOPE ==================== -->
+  <!-- ==================== ACTIVITY FLOW ==================== -->
   <g class="fade-in delay-2">
-    <rect x="403" y="60" width="423" height="152" fill="#fafafa" stroke="#e4e4e7" stroke-width="1" rx="3"/>
-    
-    <path d="M 403 82 L 826 82" stroke="#e4e4e7" stroke-width="1"/>
-    <text x="415" y="76" font-size="9.5" font-weight="700" fill="#a1a1aa">// ACTIVITY_OSCILLOSCOPE (52 WEEKS)</text>
-    <text x="735" y="76" font-size="8.5" fill="#a1a1aa">[SEISMOGRAPH]</text>
+    <!-- Panel Container -->
+    <rect x="408" y="86" width="418" height="148" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1" rx="10"/>
 
-    <!-- Scope Grid -->
-    <rect x="412" y="92" width="400" height="104" fill="url(#gridPattern_light)" opacity="0.6"/>
+    <!-- Panel Header -->
+    <text x="428" y="110" font-size="11" font-weight="600" fill="#57606a">Contribution Rhythm</text>
+    <text x="806" y="110" text-anchor="end" font-size="10" font-weight="500" fill="#8c959f">52-Week Trajectory</text>
 
-    <!-- Baseline & Grids -->
-    <line x1="412" y1="188" x2="812" y2="188" stroke="#d4d4d8" stroke-width="0.8"/>
-    <line x1="412" y1="146.0" x2="812" y2="146.0" stroke="#e4e4e7" stroke-dasharray="2,4" stroke-width="0.8"/>
-    
-    <!-- Area Fill -->
-    <path d="M 422.0 186.5 C 425.4 186.5, 426.2 188.0, 429.5 188.0 C 432.9 188.0, 433.7 188.0, 437.1 188.0 C 440.5 188.0, 441.2 188.0, 444.6 188.0 C 448.0 188.0, 448.8 188.0, 452.2 188.0 C 455.6 188.0, 456.3 188.0, 459.7 188.0 C 463.1 188.0, 463.9 188.0, 467.3 188.0 C 470.7 188.0, 471.4 187.5, 474.8 187.5 C 478.2 187.5, 479.0 188.0, 482.4 188.0 C 485.8 188.0, 486.5 188.0, 489.9 188.0 C 493.3 188.0, 494.1 104.0, 497.5 104.0 C 500.9 104.0, 501.6 166.9, 505.0 166.9 C 508.4 166.9, 509.2 173.6, 512.6 173.6 C 516.0 173.6, 516.7 187.0, 520.1 187.0 C 523.5 187.0, 524.3 177.7, 527.7 177.7 C 531.1 177.7, 531.8 170.0, 535.2 170.0 C 538.6 170.0, 539.4 185.4, 542.8 185.4 C 546.2 185.4, 546.9 160.7, 550.3 160.7 C 553.7 160.7, 554.5 187.5, 557.9 187.5 C 561.3 187.5, 562.0 188.0, 565.4 188.0 C 568.8 188.0, 569.6 187.0, 573.0 187.0 C 576.4 187.0, 577.1 188.0, 580.5 188.0 C 583.9 188.0, 584.7 182.8, 588.1 182.8 C 591.5 182.8, 592.2 177.7, 595.6 177.7 C 599.0 177.7, 599.8 185.4, 603.2 185.4 C 606.6 185.4, 607.3 151.9, 610.7 151.9 C 614.1 151.9, 614.9 176.7, 618.3 176.7 C 621.7 176.7, 622.4 179.8, 625.8 179.8 C 629.2 179.8, 630.0 184.9, 633.4 184.9 C 636.8 184.9, 637.5 188.0, 640.9 188.0 C 644.3 188.0, 645.1 188.0, 648.5 188.0 C 651.9 188.0, 652.6 187.5, 656.0 187.5 C 659.4 187.5, 660.2 182.3, 663.6 182.3 C 667.0 182.3, 667.7 188.0, 671.1 188.0 C 674.5 188.0, 675.3 179.2, 678.7 179.2 C 682.1 179.2, 682.8 188.0, 686.2 188.0 C 689.6 188.0, 690.4 183.9, 693.8 183.9 C 697.2 183.9, 697.9 167.4, 701.3 167.4 C 704.7 167.4, 705.5 180.8, 708.9 180.8 C 712.3 180.8, 713.0 173.6, 716.4 173.6 C 719.8 173.6, 720.6 179.8, 724.0 179.8 C 727.4 179.8, 728.1 182.8, 731.5 182.8 C 734.9 182.8, 735.7 188.0, 739.1 188.0 C 742.5 188.0, 743.2 188.0, 746.6 188.0 C 750.0 188.0, 750.8 188.0, 754.2 188.0 C 757.6 188.0, 758.3 188.0, 761.7 188.0 C 765.1 188.0, 765.9 188.0, 769.3 188.0 C 772.7 188.0, 773.4 185.9, 776.8 185.9 C 780.2 185.9, 781.0 156.6, 784.4 156.6 C 787.8 156.6, 788.5 134.9, 791.9 134.9 C 795.3 134.9, 796.1 145.2, 799.5 145.2 C 802.8 145.2, 803.6 155.0, 807.0 155.0 L 807.0 188 L 422.0 188 Z" fill="url(#areaGrad_light)"/>
+    <!-- Faint Guide Lines -->
+    <line x1="428" y1="202" x2="806" y2="202" stroke="#e1e4e8" stroke-width="1"/>
+    <line x1="428" y1="167.0" x2="806" y2="167.0" stroke="#e1e4e8" stroke-dasharray="3,4" stroke-width="0.75"/>
 
-    <!-- Animated Waveform Stroke -->
-    <path class="draw-stroke" d="M 422.0 186.5 C 425.4 186.5, 426.2 188.0, 429.5 188.0 C 432.9 188.0, 433.7 188.0, 437.1 188.0 C 440.5 188.0, 441.2 188.0, 444.6 188.0 C 448.0 188.0, 448.8 188.0, 452.2 188.0 C 455.6 188.0, 456.3 188.0, 459.7 188.0 C 463.1 188.0, 463.9 188.0, 467.3 188.0 C 470.7 188.0, 471.4 187.5, 474.8 187.5 C 478.2 187.5, 479.0 188.0, 482.4 188.0 C 485.8 188.0, 486.5 188.0, 489.9 188.0 C 493.3 188.0, 494.1 104.0, 497.5 104.0 C 500.9 104.0, 501.6 166.9, 505.0 166.9 C 508.4 166.9, 509.2 173.6, 512.6 173.6 C 516.0 173.6, 516.7 187.0, 520.1 187.0 C 523.5 187.0, 524.3 177.7, 527.7 177.7 C 531.1 177.7, 531.8 170.0, 535.2 170.0 C 538.6 170.0, 539.4 185.4, 542.8 185.4 C 546.2 185.4, 546.9 160.7, 550.3 160.7 C 553.7 160.7, 554.5 187.5, 557.9 187.5 C 561.3 187.5, 562.0 188.0, 565.4 188.0 C 568.8 188.0, 569.6 187.0, 573.0 187.0 C 576.4 187.0, 577.1 188.0, 580.5 188.0 C 583.9 188.0, 584.7 182.8, 588.1 182.8 C 591.5 182.8, 592.2 177.7, 595.6 177.7 C 599.0 177.7, 599.8 185.4, 603.2 185.4 C 606.6 185.4, 607.3 151.9, 610.7 151.9 C 614.1 151.9, 614.9 176.7, 618.3 176.7 C 621.7 176.7, 622.4 179.8, 625.8 179.8 C 629.2 179.8, 630.0 184.9, 633.4 184.9 C 636.8 184.9, 637.5 188.0, 640.9 188.0 C 644.3 188.0, 645.1 188.0, 648.5 188.0 C 651.9 188.0, 652.6 187.5, 656.0 187.5 C 659.4 187.5, 660.2 182.3, 663.6 182.3 C 667.0 182.3, 667.7 188.0, 671.1 188.0 C 674.5 188.0, 675.3 179.2, 678.7 179.2 C 682.1 179.2, 682.8 188.0, 686.2 188.0 C 689.6 188.0, 690.4 183.9, 693.8 183.9 C 697.2 183.9, 697.9 167.4, 701.3 167.4 C 704.7 167.4, 705.5 180.8, 708.9 180.8 C 712.3 180.8, 713.0 173.6, 716.4 173.6 C 719.8 173.6, 720.6 179.8, 724.0 179.8 C 727.4 179.8, 728.1 182.8, 731.5 182.8 C 734.9 182.8, 735.7 188.0, 739.1 188.0 C 742.5 188.0, 743.2 188.0, 746.6 188.0 C 750.0 188.0, 750.8 188.0, 754.2 188.0 C 757.6 188.0, 758.3 188.0, 761.7 188.0 C 765.1 188.0, 765.9 188.0, 769.3 188.0 C 772.7 188.0, 773.4 185.9, 776.8 185.9 C 780.2 185.9, 781.0 156.6, 784.4 156.6 C 787.8 156.6, 788.5 134.9, 791.9 134.9 C 795.3 134.9, 796.1 145.2, 799.5 145.2 C 802.8 145.2, 803.6 155.0, 807.0 155.0" fill="none" stroke="#09090b" stroke-width="1.3" stroke-linejoin="round" filter="none"/>
+    <!-- Gradient Fill -->
+    <path d="M 430.0 200.7 C 433.3 200.7, 434.1 202.0, 437.4 202.0 C 440.7 202.0, 441.4 202.0, 444.7 202.0 C 448.1 202.0, 448.8 202.0, 452.1 202.0 C 455.4 202.0, 456.2 202.0, 459.5 202.0 C 462.8 202.0, 463.5 202.0, 466.9 202.0 C 470.2 202.0, 470.9 202.0, 474.2 202.0 C 477.6 202.0, 478.3 201.6, 481.6 201.6 C 484.9 201.6, 485.7 202.0, 489.0 202.0 C 492.3 202.0, 493.0 202.0, 496.4 202.0 C 499.7 202.0, 500.4 132.0, 503.7 132.0 C 507.0 132.0, 507.8 184.4, 511.1 184.4 C 514.4 184.4, 515.2 190.0, 518.5 190.0 C 521.8 190.0, 522.5 201.1, 525.8 201.1 C 529.2 201.1, 529.9 193.4, 533.2 193.4 C 536.5 193.4, 537.3 187.0, 540.6 187.0 C 543.9 187.0, 544.6 199.9, 548.0 199.9 C 551.3 199.9, 552.0 179.2, 555.3 179.2 C 558.7 179.2, 559.4 201.6, 562.7 201.6 C 566.0 201.6, 566.8 202.0, 570.1 202.0 C 573.4 202.0, 574.1 201.1, 577.5 201.1 C 580.8 201.1, 581.5 202.0, 584.8 202.0 C 588.1 202.0, 588.9 197.7, 592.2 197.7 C 595.5 197.7, 596.3 193.4, 599.6 193.4 C 602.9 193.4, 603.6 199.9, 606.9 199.9 C 610.3 199.9, 611.0 171.9, 614.3 171.9 C 617.6 171.9, 618.4 192.6, 621.7 192.6 C 625.0 192.6, 625.7 195.1, 629.1 195.1 C 632.4 195.1, 633.1 199.4, 636.4 199.4 C 639.7 199.4, 640.5 202.0, 643.8 202.0 C 647.1 202.0, 647.9 202.0, 651.2 202.0 C 654.5 202.0, 655.2 201.6, 658.5 201.6 C 661.9 201.6, 662.6 197.3, 665.9 197.3 C 669.2 197.3, 670.0 202.0, 673.3 202.0 C 676.6 202.0, 677.3 194.7, 680.7 194.7 C 684.0 194.7, 684.7 202.0, 688.0 202.0 C 691.4 202.0, 692.1 198.6, 695.4 198.6 C 698.7 198.6, 699.5 184.8, 702.8 184.8 C 706.1 184.8, 706.8 196.0, 710.2 196.0 C 713.5 196.0, 714.2 190.0, 717.5 190.0 C 720.8 190.0, 721.6 195.1, 724.9 195.1 C 728.2 195.1, 729.0 197.7, 732.3 197.7 C 735.6 197.7, 736.3 202.0, 739.6 202.0 C 743.0 202.0, 743.7 202.0, 747.0 202.0 C 750.3 202.0, 751.1 202.0, 754.4 202.0 C 757.7 202.0, 758.4 202.0, 761.8 202.0 C 765.1 202.0, 765.8 202.0, 769.1 202.0 C 772.5 202.0, 773.2 200.3, 776.5 200.3 C 779.8 200.3, 780.6 175.8, 783.9 175.8 C 787.2 175.8, 787.9 157.8, 791.3 157.8 C 794.6 157.8, 795.3 166.4, 798.6 166.4 C 801.9 166.4, 802.7 174.5, 806.0 174.5 L 806.0 202 L 430.0 202 Z" fill="url(#curveGrad_light)"/>
 
-    <!-- Peak Diamond Marker -->
-    <g transform="translate(497.5, 104.0)">
-      <path d="M 0 -4 L 4 0 L 0 4 L -4 0 Z" fill="#09090b"/>
-      <circle cx="0" cy="0" r="3" fill="none" stroke="#09090b" class="pulse-marker"/>
-      <line x1="0" y1="-5" x2="0" y2="-12" stroke="#d4d4d8" stroke-width="0.8"/>
-      <text x="0" y="-15" text-anchor="middle" font-size="8" font-weight="700" fill="#09090b">PEAK: 163</text>
+    <!-- Elegant Curve Stroke -->
+    <path class="draw-stroke" d="M 430.0 200.7 C 433.3 200.7, 434.1 202.0, 437.4 202.0 C 440.7 202.0, 441.4 202.0, 444.7 202.0 C 448.1 202.0, 448.8 202.0, 452.1 202.0 C 455.4 202.0, 456.2 202.0, 459.5 202.0 C 462.8 202.0, 463.5 202.0, 466.9 202.0 C 470.2 202.0, 470.9 202.0, 474.2 202.0 C 477.6 202.0, 478.3 201.6, 481.6 201.6 C 484.9 201.6, 485.7 202.0, 489.0 202.0 C 492.3 202.0, 493.0 202.0, 496.4 202.0 C 499.7 202.0, 500.4 132.0, 503.7 132.0 C 507.0 132.0, 507.8 184.4, 511.1 184.4 C 514.4 184.4, 515.2 190.0, 518.5 190.0 C 521.8 190.0, 522.5 201.1, 525.8 201.1 C 529.2 201.1, 529.9 193.4, 533.2 193.4 C 536.5 193.4, 537.3 187.0, 540.6 187.0 C 543.9 187.0, 544.6 199.9, 548.0 199.9 C 551.3 199.9, 552.0 179.2, 555.3 179.2 C 558.7 179.2, 559.4 201.6, 562.7 201.6 C 566.0 201.6, 566.8 202.0, 570.1 202.0 C 573.4 202.0, 574.1 201.1, 577.5 201.1 C 580.8 201.1, 581.5 202.0, 584.8 202.0 C 588.1 202.0, 588.9 197.7, 592.2 197.7 C 595.5 197.7, 596.3 193.4, 599.6 193.4 C 602.9 193.4, 603.6 199.9, 606.9 199.9 C 610.3 199.9, 611.0 171.9, 614.3 171.9 C 617.6 171.9, 618.4 192.6, 621.7 192.6 C 625.0 192.6, 625.7 195.1, 629.1 195.1 C 632.4 195.1, 633.1 199.4, 636.4 199.4 C 639.7 199.4, 640.5 202.0, 643.8 202.0 C 647.1 202.0, 647.9 202.0, 651.2 202.0 C 654.5 202.0, 655.2 201.6, 658.5 201.6 C 661.9 201.6, 662.6 197.3, 665.9 197.3 C 669.2 197.3, 670.0 202.0, 673.3 202.0 C 676.6 202.0, 677.3 194.7, 680.7 194.7 C 684.0 194.7, 684.7 202.0, 688.0 202.0 C 691.4 202.0, 692.1 198.6, 695.4 198.6 C 698.7 198.6, 699.5 184.8, 702.8 184.8 C 706.1 184.8, 706.8 196.0, 710.2 196.0 C 713.5 196.0, 714.2 190.0, 717.5 190.0 C 720.8 190.0, 721.6 195.1, 724.9 195.1 C 728.2 195.1, 729.0 197.7, 732.3 197.7 C 735.6 197.7, 736.3 202.0, 739.6 202.0 C 743.0 202.0, 743.7 202.0, 747.0 202.0 C 750.3 202.0, 751.1 202.0, 754.4 202.0 C 757.7 202.0, 758.4 202.0, 761.8 202.0 C 765.1 202.0, 765.8 202.0, 769.1 202.0 C 772.5 202.0, 773.2 200.3, 776.5 200.3 C 779.8 200.3, 780.6 175.8, 783.9 175.8 C 787.2 175.8, 787.9 157.8, 791.3 157.8 C 794.6 157.8, 795.3 166.4, 798.6 166.4 C 801.9 166.4, 802.7 174.5, 806.0 174.5" fill="none" stroke="#24292f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Peak Indicator -->
+    <g transform="translate(503.7, 132.0)">
+      <circle cx="0" cy="0" r="3" fill="#24292f"/>
+      <circle cx="0" cy="0" r="3" fill="none" stroke="#24292f" class="pulse-marker"/>
+      <text x="0" y="-10" text-anchor="middle" font-size="9" font-weight="600" fill="#1f2328">Peak: 163</text>
     </g>
 
-    <!-- Laser Scanline Tracer -->
-    <g transform="translate(422, 96)">
-      <line class="scan-line" x1="0" y1="0" x2="0" y2="98" stroke="#09090b" stroke-width="0.8" opacity="0.4"/>
-    </g>
-
-    <!-- Ticks -->
-    <g font-size="8" fill="#a1a1aa">
-      <text x="422" y="200">W01</text>
-      <text x="518.2" y="200" text-anchor="middle">W13</text>
-      <text x="614.5" y="200" text-anchor="middle">W26</text>
-      <text x="710.8" y="200" text-anchor="middle">W39</text>
-      <text x="807" y="200" text-anchor="end">W52</text>
+    <!-- Timeline Labels -->
+    <g font-size="9.5" font-weight="500" fill="#8c959f">
+      <text x="430" y="221">Q1</text>
+      <text x="554.1" y="221" text-anchor="middle">Q2</text>
+      <text x="678.2" y="221" text-anchor="middle">Q3</text>
+      <text x="806" y="221" text-anchor="end">Q4</text>
     </g>
   </g>
 
-  <!-- ==================== ARTIFACT REGISTER ==================== -->
+  <!-- ==================== FEATURED PROJECTS ==================== -->
   <g class="fade-in delay-3">
-    <rect x="24" y="224" width="802" height="98" fill="#fafafa" stroke="#e4e4e7" stroke-width="1" rx="3"/>
-    
-    <path d="M 24 246 L 826 246" stroke="#e4e4e7" stroke-width="1"/>
-    <text x="36" y="240" font-size="9.5" font-weight="700" fill="#a1a1aa">// REGISTERED_ARTIFACTS (FEATURED PROJECTS)</text>
-    <text x="735" y="240" font-size="8.5" fill="#a1a1aa">[SYSTEMS &amp; TOOLS]</text>
-    <g transform="translate(36, 252)">
-      <text x="0" y="16" font-size="10.5" font-weight="700" fill="#09090b">[01] TWISTER</text>
-      <text x="0" y="34" font-size="8.5" fill="#52525b">Desktop-agnostic GUI for Linux ...</text>
-      <text x="0" y="52" font-size="8" fill="#a1a1aa">TS / Linux</text>
-      <text x="163" y="52" text-anchor="end" font-size="8.5" font-weight="700" fill="#09090b">★ 11</text>
-      <line x1='175' y1='8' x2='175' y2='54' stroke='#e4e4e7' stroke-width='0.8'/>
-    </g>
-    <g transform="translate(232, 252)">
-      <text x="0" y="16" font-size="10.5" font-weight="700" fill="#09090b">[02] NEOCALC-CORE</text>
-      <text x="0" y="34" font-size="8.5" fill="#52525b">Rust math engine judging your s...</text>
-      <text x="0" y="52" font-size="8" fill="#a1a1aa">Rust</text>
-      <text x="163" y="52" text-anchor="end" font-size="8.5" font-weight="700" fill="#09090b">★ 1</text>
-      <line x1='175' y1='8' x2='175' y2='54' stroke='#e4e4e7' stroke-width='0.8'/>
-    </g>
-    <g transform="translate(428, 252)">
-      <text x="0" y="16" font-size="10.5" font-weight="700" fill="#09090b">[03] LIBRATBAG-RS</text>
-      <text x="0" y="34" font-size="8.5" fill="#52525b">DBus daemon for high-end gaming...</text>
-      <text x="0" y="52" font-size="8" fill="#a1a1aa">Rust / DBus</text>
-      <text x="163" y="52" text-anchor="end" font-size="8.5" font-weight="700" fill="#09090b">★ 1</text>
-      <line x1='175' y1='8' x2='175' y2='54' stroke='#e4e4e7' stroke-width='0.8'/>
-    </g>
-    <g transform="translate(624, 252)">
-      <text x="0" y="16" font-size="10.5" font-weight="700" fill="#09090b">[04] LEMURS</text>
-      <text x="0" y="34" font-size="8.5" fill="#52525b">Customizable TUI display &amp; logi...</text>
-      <text x="0" y="52" font-size="8" fill="#a1a1aa">Rust / TUI</text>
-      <text x="173" y="52" text-anchor="end" font-size="8.5" font-weight="700" fill="#09090b"></text>
+    <!-- Project Card 1 -->
+    <g transform="translate(24, 248)">
+      <rect width="187" height="84" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1" rx="8"/>
+      <text x="12" y="25" font-size="12" font-weight="600" fill="#1f2328">twister</text>
+      <rect x="135" y="12" width="40" height="18" fill="#eaeef2" rx="9"/>
+      <text x="155.0" y="24" text-anchor="middle" font-size="9" font-weight="600" fill="#57606a">★ 11</text>
+      <text x="12" y="45" font-size="9.5" font-weight="400" fill="#57606a">Desktop-agnostic GUI for Linux ga...</text>
       
+      <!-- Tech Badge -->
+      <rect x="12" y="57" width="72" height="17" fill="#eaeef2" rx="4"/>
+      <text x="48.0" y="69" text-anchor="middle" font-size="8.5" font-weight="500" fill="#8c959f">TS / Linux</text>
+    </g>
+    <!-- Project Card 2 -->
+    <g transform="translate(225, 248)">
+      <rect width="187" height="84" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1" rx="8"/>
+      <text x="12" y="25" font-size="12" font-weight="600" fill="#1f2328">neocalc-core</text>
+      <rect x="141" y="12" width="34" height="18" fill="#eaeef2" rx="9"/>
+      <text x="158.0" y="24" text-anchor="middle" font-size="9" font-weight="600" fill="#57606a">★ 1</text>
+      <text x="12" y="45" font-size="9.5" font-weight="400" fill="#57606a">Rust math engine judging your skills</text>
+      
+      <!-- Tech Badge -->
+      <rect x="12" y="57" width="38" height="17" fill="#eaeef2" rx="4"/>
+      <text x="31.0" y="69" text-anchor="middle" font-size="8.5" font-weight="500" fill="#8c959f">Rust</text>
+    </g>
+    <!-- Project Card 3 -->
+    <g transform="translate(426, 248)">
+      <rect width="187" height="84" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1" rx="8"/>
+      <text x="12" y="25" font-size="12" font-weight="600" fill="#1f2328">libratbag-rs</text>
+      <rect x="141" y="12" width="34" height="18" fill="#eaeef2" rx="9"/>
+      <text x="158.0" y="24" text-anchor="middle" font-size="9" font-weight="600" fill="#57606a">★ 1</text>
+      <text x="12" y="45" font-size="9.5" font-weight="400" fill="#57606a">DBus daemon for high-end gaming mice</text>
+      
+      <!-- Tech Badge -->
+      <rect x="12" y="57" width="78" height="17" fill="#eaeef2" rx="4"/>
+      <text x="51.0" y="69" text-anchor="middle" font-size="8.5" font-weight="500" fill="#8c959f">Rust / DBus</text>
+    </g>
+    <!-- Project Card 4 -->
+    <g transform="translate(627, 248)">
+      <rect width="199" height="84" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1" rx="8"/>
+      <text x="12" y="25" font-size="12" font-weight="600" fill="#1f2328">lemurs</text>
+      
+      <text x="12" y="45" font-size="9.5" font-weight="400" fill="#57606a">Customizable TUI display &amp; login ...</text>
+      
+      <!-- Tech Badge -->
+      <rect x="12" y="57" width="72" height="17" fill="#eaeef2" rx="4"/>
+      <text x="48.0" y="69" text-anchor="middle" font-size="8.5" font-weight="500" fill="#8c959f">Rust / TUI</text>
     </g>
   </g>
 
   <!-- ==================== FOOTER ==================== -->
-  <g class="fade-in delay-3" font-size="8.5" fill="#a1a1aa">
-    <line x1="24" y1="334" x2="826" y2="334" stroke="#e4e4e7" stroke-width="0.8"/>
+  <g class="fade-in delay-3">
+    <line x1="24" y1="346" x2="826" y2="346" stroke="#d0d7de" stroke-width="1"/>
     
-    <text x="28" y="348">ENV: x86_64 // ARM64 // Linux &amp; macOS</text>
-    <text x="425" y="348" text-anchor="middle">LOC: Goiás, Brazil (-16.6869° S, 49.2648° W)</text>
-    <text x="822" y="348" text-anchor="end">SYS.SYNC: 2026.10.04 // 01:28 UTC <tspan class="cursor" fill="#09090b">█</tspan></text>
+    <text x="28" y="364" font-size="10" font-weight="400" fill="#8c959f">Universidade Federal de Goiás · Goiás, Brazil</text>
+    <text x="822" y="364" text-anchor="end" font-size="10" font-weight="400" fill="#8c959f">Updated via GitHub Actions · SVG Telemetry</text>
   </g>
 </svg>

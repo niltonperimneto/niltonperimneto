@@ -82,7 +82,7 @@ def fetch_github_data(username):
                 headers={
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json",
-                    "User-Agent": "ZedProfileCard"
+                    "User-Agent": "ProfileCard"
                 }
             )
             with urllib.request.urlopen(req) as resp:
@@ -92,11 +92,10 @@ def fetch_github_data(username):
         except Exception as e:
             print(f"Warning: GraphQL request with GITHUB_TOKEN failed: {e}")
 
-    # 3. Fallback / mock profile data
-    print("Using cached profile telemetry fallback...")
+    # 3. Fallback profile data
     return {
         "login": username,
-        "name": "NILTON PERIM NETO",
+        "name": "Nilton Perim Neto",
         "bio": "Not a Programmer, just a historian.",
         "location": "Goiás, Brazil",
         "repositories": { "totalCount": 30, "nodes": [] },
@@ -117,31 +116,33 @@ def generate_svg(theme="dark", data=None, config=None):
     is_dark = (theme == "dark")
     
     if is_dark:
-        bg = "#09090b"
-        panel_bg = "#111114"
-        subpanel_bg = "#18181b"
-        border = "#27272a"
-        border_light = "#3f3f46"
-        grid_line = "#1a1a1e"
-        text_primary = "#fafafa"
-        text_secondary = "#a1a1aa"
-        text_dim = "#52525b"
+        bg = "#0d1117"
+        card_bg = "#161b22"
+        inner_bg = "#21262d"
+        border = "#30363d"
+        border_subtle = "#21262d"
+        text_primary = "#f0f6fc"
+        text_secondary = "#8b949e"
+        text_tertiary = "#6e7681"
         accent = "#ffffff"
-        pulse_color = "#ffffff"
-        glow_filter = "drop-shadow(0 0 3px rgba(255, 255, 255, 0.45))"
+        accent_stroke = "#e6edf3"
+        accent_fill_opacity = 0.12
+        dot_color = "#3fb950"
+        bar_colors = ["#f0f6fc", "#8b949e", "#6e7681", "#30363d"]
     else:
         bg = "#ffffff"
-        panel_bg = "#fafafa"
-        subpanel_bg = "#f4f4f5"
-        border = "#e4e4e7"
-        border_light = "#d4d4d8"
-        grid_line = "#f4f4f6"
-        text_primary = "#09090b"
-        text_secondary = "#52525b"
-        text_dim = "#a1a1aa"
-        accent = "#09090b"
-        pulse_color = "#09090b"
-        glow_filter = "none"
+        card_bg = "#f6f8fa"
+        inner_bg = "#eaeef2"
+        border = "#d0d7de"
+        border_subtle = "#e1e4e8"
+        text_primary = "#1f2328"
+        text_secondary = "#57606a"
+        text_tertiary = "#8c959f"
+        accent = "#1f2328"
+        accent_stroke = "#24292f"
+        accent_fill_opacity = 0.08
+        dot_color = "#1a7f37"
+        bar_colors = ["#1f2328", "#57606a", "#8c959f", "#d0d7de"]
 
     total_repos = data.get("repositories", {}).get("totalCount", 30)
     cal = data.get("contributionsCollection", {}).get("contributionCalendar", {})
@@ -160,10 +161,11 @@ def generate_svg(theme="dark", data=None, config=None):
     max_week = max(weekly_counts) if weekly_counts and max(weekly_counts) > 0 else 1
     peak_idx = weekly_counts.index(max_week) if weekly_counts else 0
 
-    wave_x = 422
-    wave_w = 385
-    wave_y_base = 188
-    wave_y_top = 104
+    # Activity chart dimensions
+    wave_x = 430
+    wave_w = 376
+    wave_y_base = 202
+    wave_y_top = 132
     wave_h = wave_y_base - wave_y_top
 
     points = []
@@ -176,7 +178,7 @@ def generate_svg(theme="dark", data=None, config=None):
         py = wave_y_base - (normalized * wave_h)
         points.append((px, py))
 
-    # Path construction with bezier smoothing
+    # Path construction with smooth Bezier curve
     path_d = f"M {points[0][0]:.1f} {points[0][1]:.1f}"
     for i in range(1, len(points)):
         p0 = points[i - 1]
@@ -197,256 +199,234 @@ def generate_svg(theme="dark", data=None, config=None):
         {"name": "C / Asm", "pct": 12}
     ])
 
-    lang_bar_x = 46
-    lang_bar_w = 325
-    lang_rects = []
+    lang_bar_x = 44
+    lang_bar_w = 328
+    lang_bar_h = 7
     curr_x = lang_bar_x
-    for lang in langs:
+    lang_rects = []
+    for idx, lang in enumerate(langs):
         w_part = (lang.get("pct", 0) / 100.0) * lang_bar_w
-        lang_rects.append((lang.get("name", ""), lang.get("pct", 0), curr_x, w_part))
+        color = bar_colors[idx % len(bar_colors)]
+        lang_rects.append((xesc(lang.get("name", "")), lang.get("pct", 0), curr_x, w_part, color))
         curr_x += w_part
 
     featured = config.get("featured_repos", [])[:4]
-    now_str = datetime.utcnow().strftime("%Y.%m.%d // %H:%M UTC")
-
-    display_name = xesc(config.get("name", "NILTON PERIM NETO"))
+    
+    raw_name = config.get("name", "Nilton Perim Neto")
+    display_name = xesc(raw_name.title() if raw_name.isupper() else raw_name)
     tagline = xesc(config.get("tagline", "Not a Programmer, just a historian."))
-    system_env = xesc(config.get("system_env", "x86_64 // ARM64 // Linux & macOS"))
+    affiliation = xesc(config.get("affiliation", "Universidade Federal de Goiás"))
     location = xesc(config.get("location", "Goiás, Brazil"))
-    coordinates = xesc(config.get("coordinates", "-16.68° S, -49.26° W"))
 
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 370" width="100%" height="100%">
+    # SVG Construction
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 380" width="100%" height="100%">
   <defs>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap');
-      
       text {{
-        font-family: 'JetBrains Mono', 'SF Mono', Monaco, Menlo, Consolas, monospace;
-        letter-spacing: 0.04em;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }}
+
+      .tabular {{
+        font-variant-numeric: tabular-nums;
       }}
 
       .draw-stroke {{
-        stroke-dasharray: 1800;
-        stroke-dashoffset: 1800;
-        animation: drawPath 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        stroke-dasharray: 2000;
+        stroke-dashoffset: 2000;
+        animation: drawPath 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }}
 
       .fade-in {{
         opacity: 0;
-        animation: fadeIn 0.8s ease forwards;
+        animation: fadeIn 0.6s ease forwards;
       }}
 
-      .delay-1 {{ animation-delay: 0.25s; }}
-      .delay-2 {{ animation-delay: 0.5s; }}
-      .delay-3 {{ animation-delay: 0.75s; }}
+      .delay-1 {{ animation-delay: 0.15s; }}
+      .delay-2 {{ animation-delay: 0.3s; }}
+      .delay-3 {{ animation-delay: 0.45s; }}
 
       .pulse-marker {{
-        animation: pulse 2.2s infinite ease-in-out;
-      }}
-
-      .cursor {{
-        animation: blink 1s step-end infinite;
-      }}
-
-      .scan-line {{
-        animation: scan 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        animation: pulse 2.4s infinite ease-in-out;
       }}
 
       @keyframes drawPath {{
-        to {{
-          stroke-dashoffset: 0;
-        }}
+        to {{ stroke-dashoffset: 0; }}
       }}
 
       @keyframes fadeIn {{
-        to {{
-          opacity: 1;
-        }}
+        to {{ opacity: 1; }}
       }}
 
       @keyframes pulse {{
         0%, 100% {{ r: 3; opacity: 1; }}
-        50% {{ r: 6.5; opacity: 0.25; }}
-      }}
-
-      @keyframes blink {{
-        0%, 49% {{ opacity: 1; }}
-        50%, 100% {{ opacity: 0; }}
-      }}
-
-      @keyframes scan {{
-        0% {{ transform: translateX(0px); opacity: 0; }}
-        12% {{ opacity: 0.6; }}
-        88% {{ opacity: 0.6; }}
-        100% {{ transform: translateX({wave_w}px); opacity: 0; }}
+        50% {{ r: 5.5; opacity: 0.3; }}
       }}
     </style>
 
-    <linearGradient id="areaGrad_{theme}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="{accent}" stop-opacity="{0.12 if is_dark else 0.07}"/>
+    <linearGradient id="curveGrad_{theme}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="{accent}" stop-opacity="{accent_fill_opacity}"/>
       <stop offset="100%" stop-color="{accent}" stop-opacity="0.0"/>
     </linearGradient>
 
-    <pattern id="gridPattern_{theme}" width="20" height="20" patternUnits="userSpaceOnUse">
-      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="{grid_line}" stroke-width="0.75"/>
-    </pattern>
+    <clipPath id="langBarClip">
+      <rect x="{lang_bar_x}" y="184" width="{lang_bar_w}" height="{lang_bar_h}" rx="3.5"/>
+    </clipPath>
   </defs>
 
-  <!-- Outer Frame -->
-  <rect width="850" height="370" fill="{bg}" rx="6"/>
-  <rect x="0.5" y="0.5" width="849" height="369" fill="none" stroke="{border}" stroke-width="1" rx="5.5"/>
-
-  <!-- Precision Corner Crosshairs (+) -->
-  <path d="M 7 13 L 19 13 M 13 7 L 13 19" stroke="{border_light}" stroke-width="1"/>
-  <path d="M 831 13 L 843 13 M 837 7 L 837 19" stroke="{border_light}" stroke-width="1"/>
-  <path d="M 7 357 L 19 357 M 13 351 L 13 363" stroke="{border_light}" stroke-width="1"/>
-  <path d="M 831 357 L 843 357 M 837 351 L 837 363" stroke="{border_light}" stroke-width="1"/>
+  <!-- Card Background -->
+  <rect width="850" height="380" fill="{bg}" rx="12"/>
+  <rect x="0.5" y="0.5" width="849" height="379" fill="none" stroke="{border}" stroke-width="1" rx="11.5"/>
 
   <!-- ==================== HEADER ==================== -->
   <g class="fade-in">
-    <line x1="24" y1="46" x2="826" y2="46" stroke="{border}" stroke-width="1"/>
-    <text x="28" y="32" font-size="11.5" font-weight="700" fill="{accent}">[ 01 // {display_name} ]</text>
-    <text x="245" y="32" font-size="10" font-weight="400" fill="{text_secondary}">{tagline}</text>
-    
-    <rect x="674" y="20" width="152" height="18" fill="{subpanel_bg}" stroke="{border_light}" stroke-width="0.8" rx="2"/>
-    <circle cx="686" cy="29" r="3" fill="{accent}"/>
-    <text x="696" y="33" font-size="9" font-weight="500" fill="{text_primary}">SYS.TELEMETRY // NOMINAL</text>
+    <!-- Monogram Circle -->
+    <circle cx="44" cy="38" r="16" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <text x="44" y="42" text-anchor="middle" font-size="11" font-weight="600" fill="{text_primary}">NP</text>
+
+    <!-- Name & Tagline -->
+    <text x="70" y="34" font-size="16" font-weight="600" fill="{text_primary}" letter-spacing="-0.01em">{display_name}</text>
+    <text x="70" y="50" font-size="11.5" font-weight="400" fill="{text_secondary}">{tagline}</text>
+
+    <!-- Status Badge -->
+    <rect x="636" y="24" width="190" height="28" fill="{card_bg}" stroke="{border}" stroke-width="1" rx="14"/>
+    <circle cx="652" cy="38" r="3.5" fill="{dot_color}"/>
+    <text x="664" y="42" font-size="11" font-weight="500" fill="{text_secondary}">Systems &amp; Open Source</text>
+
+    <!-- Header Divider -->
+    <line x1="24" y1="72" x2="826" y2="72" stroke="{border}" stroke-width="1"/>
   </g>
 
-  <!-- ==================== TELEMETRY MATRIX ==================== -->
+  <!-- ==================== METRICS & LANGUAGES ==================== -->
   <g class="fade-in delay-1">
-    <rect x="24" y="60" width="365" height="152" fill="{panel_bg}" stroke="{border}" stroke-width="1" rx="3"/>
-    
-    <path d="M 24 82 L 389 82" stroke="{border}" stroke-width="1"/>
-    <text x="36" y="76" font-size="9.5" font-weight="700" fill="{text_dim}">// TELEMETRY_MATRIX</text>
-    <text x="325" y="76" font-size="8.5" fill="{text_dim}">[SYS.STAT]</text>
+    <!-- Panel Container -->
+    <rect x="24" y="86" width="368" height="148" fill="{card_bg}" stroke="{border}" stroke-width="1" rx="10"/>
 
-    <g font-size="10" fill="{text_secondary}">
-      <text x="36" y="104">REPOSITORIES</text>
-      <line x1="130" y1="102" x2="330" y2="102" stroke="{border}" stroke-dasharray="2,4" stroke-width="0.8"/>
-      <text x="375" y="104" text-anchor="end" font-weight="700" fill="{text_primary}">{total_repos}</text>
+    <!-- Stat 1: Repositories -->
+    <text x="44" y="110" font-size="9" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">REPOSITORIES</text>
+    <text x="44" y="136" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_repos}</text>
 
-      <text x="36" y="124">CONTRIBUTIONS (365D)</text>
-      <line x1="172" y1="122" x2="330" y2="122" stroke="{border}" stroke-dasharray="2,4" stroke-width="0.8"/>
-      <text x="375" y="124" text-anchor="end" font-weight="700" fill="{text_primary}">{total_contribs}</text>
+    <!-- Stat 2: Contributions -->
+    <text x="168" y="110" font-size="9" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">YEARLY COMMITS</text>
+    <text x="168" y="136" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{total_contribs}</text>
 
-      <text x="36" y="144">ACTIVITY PEAK</text>
-      <line x1="135" y1="142" x2="310" y2="142" stroke="{border}" stroke-dasharray="2,4" stroke-width="0.8"/>
-      <text x="375" y="144" text-anchor="end" font-weight="700" fill="{text_primary}">{max_week} / WEEK</text>
-    </g>
+    <!-- Stat 3: Peak Activity -->
+    <text x="292" y="110" font-size="9" font-weight="600" letter-spacing="0.06em" fill="{text_tertiary}">WEEKLY PEAK</text>
+    <text x="292" y="136" font-size="20" font-weight="600" fill="{text_primary}" class="tabular">{max_week}</text>
 
-    <text x="36" y="171" font-size="9" font-weight="700" fill="{text_dim}">// STACK_GAUGE</text>
-    
-    <!-- Hairline Segment Bar -->
-    <rect x="{lang_bar_x}" y="181" width="{lang_bar_w}" height="4" fill="{subpanel_bg}" stroke="{border}" stroke-width="0.8"/>
+    <!-- Sub-divider -->
+    <line x1="44" y1="152" x2="372" y2="152" stroke="{border_subtle}" stroke-width="1"/>
+
+    <!-- Languages Header -->
+    <text x="44" y="174" font-size="11" font-weight="600" fill="{text_secondary}">Primary Languages</text>
+
+    <!-- Multi-segment Rounded Bar -->
+    <g clip-path="url(#langBarClip)">
 """
 
-    for name, pct, lx, lw in lang_rects:
-        svg += f"""    <rect x="{lx}" y="181" width="{max(0, lw - 1):.1f}" height="4" fill="{text_primary}" opacity="0.85"/>\n"""
+    for name, pct, lx, lw, col in lang_rects:
+        svg += f"""      <rect x="{lx}" y="184" width="{lw:.1f}" height="{lang_bar_h}" fill="{col}"/>\n"""
 
-    lang_labels = ""
-    lang_x_positions = [46, 145, 235, 325]
-    for idx, lang in enumerate(langs[:4]):
-        lx = lang_x_positions[idx] if idx < len(lang_x_positions) else 46 + idx * 90
-        lname = xesc(lang.get("name", "").upper())
-        lpct = lang.get("pct", 0)
-        lang_labels += f'      <text x="{lx}" y="198">{lname} {lpct}%</text>\n'
+    svg += """    </g>\n\n    <!-- Language Legend -->\n    <g font-size="10" font-weight="500" fill="{text_secondary}">\n"""
+    
+    # Legend positions
+    legend_xs = [44, 130, 230, 310]
+    for idx, (name, pct, lx, lw, col) in enumerate(lang_rects[:4]):
+        leg_x = legend_xs[idx]
+        svg += f"""      <circle cx="{leg_x}" cy="211" r="3" fill="{col}"/>\n"""
+        svg += f"""      <text x="{leg_x + 8}" y="215" fill="{text_secondary}">{name} <tspan font-weight="400" fill="{text_tertiary}">{pct}%</tspan></text>\n"""
 
-    svg += f"""    <g font-size="8.5" fill="{text_secondary}">
-{lang_labels}    </g>
+    svg += f"""    </g>
   </g>
 
-  <!-- ==================== OSCILLOSCOPE ==================== -->
+  <!-- ==================== ACTIVITY FLOW ==================== -->
   <g class="fade-in delay-2">
-    <rect x="403" y="60" width="423" height="152" fill="{panel_bg}" stroke="{border}" stroke-width="1" rx="3"/>
-    
-    <path d="M 403 82 L 826 82" stroke="{border}" stroke-width="1"/>
-    <text x="415" y="76" font-size="9.5" font-weight="700" fill="{text_dim}">// ACTIVITY_OSCILLOSCOPE (52 WEEKS)</text>
-    <text x="735" y="76" font-size="8.5" fill="{text_dim}">[SEISMOGRAPH]</text>
+    <!-- Panel Container -->
+    <rect x="408" y="86" width="418" height="148" fill="{card_bg}" stroke="{border}" stroke-width="1" rx="10"/>
 
-    <!-- Scope Grid -->
-    <rect x="{wave_x - 10}" y="{wave_y_top - 12}" width="{wave_w + 15}" height="{wave_h + 20}" fill="url(#gridPattern_{theme})" opacity="0.6"/>
+    <!-- Panel Header -->
+    <text x="428" y="110" font-size="11" font-weight="600" fill="{text_secondary}">Contribution Rhythm</text>
+    <text x="806" y="110" text-anchor="end" font-size="10" font-weight="500" fill="{text_tertiary}">52-Week Trajectory</text>
 
-    <!-- Baseline & Grids -->
-    <line x1="{wave_x - 10}" y1="{wave_y_base}" x2="{wave_x + wave_w + 5}" y2="{wave_y_base}" stroke="{border_light}" stroke-width="0.8"/>
-    <line x1="{wave_x - 10}" y1="{wave_y_top + wave_h/2}" x2="{wave_x + wave_w + 5}" y2="{wave_y_top + wave_h/2}" stroke="{border}" stroke-dasharray="2,4" stroke-width="0.8"/>
-    
-    <!-- Area Fill -->
-    <path d="{area_d}" fill="url(#areaGrad_{theme})"/>
+    <!-- Faint Guide Lines -->
+    <line x1="428" y1="{wave_y_base}" x2="{wave_x + wave_w}" y2="{wave_y_base}" stroke="{border_subtle}" stroke-width="1"/>
+    <line x1="428" y1="{wave_y_top + wave_h/2:.1f}" x2="{wave_x + wave_w}" y2="{wave_y_top + wave_h/2:.1f}" stroke="{border_subtle}" stroke-dasharray="3,4" stroke-width="0.75"/>
 
-    <!-- Animated Waveform Stroke -->
-    <path class="draw-stroke" d="{path_d}" fill="none" stroke="{accent}" stroke-width="1.3" stroke-linejoin="round" filter="{glow_filter}"/>
+    <!-- Gradient Fill -->
+    <path d="{area_d}" fill="url(#curveGrad_{theme})"/>
 
-    <!-- Peak Diamond Marker -->
+    <!-- Elegant Curve Stroke -->
+    <path class="draw-stroke" d="{path_d}" fill="none" stroke="{accent_stroke}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Peak Indicator -->
     <g transform="translate({peak_x:.1f}, {peak_y:.1f})">
-      <path d="M 0 -4 L 4 0 L 0 4 L -4 0 Z" fill="{accent}"/>
-      <circle cx="0" cy="0" r="3" fill="none" stroke="{pulse_color}" class="pulse-marker"/>
-      <line x1="0" y1="-5" x2="0" y2="-12" stroke="{border_light}" stroke-width="0.8"/>
-      <text x="0" y="-15" text-anchor="middle" font-size="8" font-weight="700" fill="{text_primary}">PEAK: {max_week}</text>
+      <circle cx="0" cy="0" r="3" fill="{accent_stroke}"/>
+      <circle cx="0" cy="0" r="3" fill="none" stroke="{accent_stroke}" class="pulse-marker"/>
+      <text x="0" y="-10" text-anchor="middle" font-size="9" font-weight="600" fill="{text_primary}">Peak: {max_week}</text>
     </g>
 
-    <!-- Laser Scanline Tracer -->
-    <g transform="translate({wave_x}, {wave_y_top - 8})">
-      <line class="scan-line" x1="0" y1="0" x2="0" y2="{wave_h + 14}" stroke="{accent}" stroke-width="0.8" opacity="0.4"/>
-    </g>
-
-    <!-- Ticks -->
-    <g font-size="8" fill="{text_dim}">
-      <text x="{wave_x}" y="200">W01</text>
-      <text x="{wave_x + wave_w*0.25:.1f}" y="200" text-anchor="middle">W13</text>
-      <text x="{wave_x + wave_w*0.5:.1f}" y="200" text-anchor="middle">W26</text>
-      <text x="{wave_x + wave_w*0.75:.1f}" y="200" text-anchor="middle">W39</text>
-      <text x="{wave_x + wave_w}" y="200" text-anchor="end">W52</text>
+    <!-- Timeline Labels -->
+    <g font-size="9.5" font-weight="500" fill="{text_tertiary}">
+      <text x="{wave_x}" y="221">Q1</text>
+      <text x="{wave_x + wave_w*0.33:.1f}" y="221" text-anchor="middle">Q2</text>
+      <text x="{wave_x + wave_w*0.66:.1f}" y="221" text-anchor="middle">Q3</text>
+      <text x="{wave_x + wave_w}" y="221" text-anchor="end">Q4</text>
     </g>
   </g>
 
-  <!-- ==================== ARTIFACT REGISTER ==================== -->
+  <!-- ==================== FEATURED PROJECTS ==================== -->
   <g class="fade-in delay-3">
-    <rect x="24" y="224" width="802" height="98" fill="{panel_bg}" stroke="{border}" stroke-width="1" rx="3"/>
-    
-    <path d="M 24 246 L 826 246" stroke="{border}" stroke-width="1"/>
-    <text x="36" y="240" font-size="9.5" font-weight="700" fill="{text_dim}">// REGISTERED_ARTIFACTS (FEATURED PROJECTS)</text>
-    <text x="735" y="240" font-size="8.5" fill="{text_dim}">[SYSTEMS &amp; TOOLS]</text>
 """
 
     card_coords = [
-        (36, 252, 175),
-        (232, 252, 175),
-        (428, 252, 175),
-        (624, 252, 185)
+        (24, 248, 187),
+        (225, 248, 187),
+        (426, 248, 187),
+        (627, 248, 199)
     ]
 
     for idx, repo in enumerate(featured):
         bx, by, bw = card_coords[idx]
-        r_name = xesc(repo.get("name", "").upper())
+        r_name = xesc(repo.get("name", ""))
         r_desc_raw = repo.get("desc", "")
-        if len(r_desc_raw) > 34:
-            r_desc_raw = r_desc_raw[:31] + "..."
+        if len(r_desc_raw) > 36:
+            r_desc_raw = r_desc_raw[:33] + "..."
         r_desc = xesc(r_desc_raw)
         r_stack = xesc(repo.get("stack", ""))
         r_stars = repo.get("stars", 0)
 
-        star_str = f"★ {r_stars}" if r_stars > 0 else ""
-        star_str = xesc(star_str)
+        # Star badge
+        star_svg = ""
+        if r_stars > 0:
+            star_str = f"★ {r_stars}"
+            star_w = 34 if r_stars < 10 else 40
+            star_svg = f"""<rect x="{bw - star_w - 12}" y="12" width="{star_w}" height="18" fill="{inner_bg}" rx="9"/>
+      <text x="{bw - 12 - star_w/2}" y="24" text-anchor="middle" font-size="9" font-weight="600" fill="{text_secondary}">{star_str}</text>"""
 
-        svg += f"""    <g transform="translate({bx}, {by})">
-      <text x="0" y="16" font-size="10.5" font-weight="700" fill="{text_primary}">[{idx + 1:02d}] {r_name}</text>
-      <text x="0" y="34" font-size="8.5" fill="{text_secondary}">{r_desc}</text>
-      <text x="0" y="52" font-size="8" fill="{text_dim}">{r_stack}</text>
-      <text x="{bw - 12}" y="52" text-anchor="end" font-size="8.5" font-weight="700" fill="{text_primary}">{star_str}</text>
-      {"<line x1='" + str(bw) + "' y1='8' x2='" + str(bw) + "' y2='54' stroke='" + border + "' stroke-width='0.8'/>" if idx < 3 else ""}
+        # Stack tag width approx
+        tag_w = max(38, len(r_stack) * 6 + 12)
+
+        svg += f"""    <!-- Project Card {idx + 1} -->
+    <g transform="translate({bx}, {by})">
+      <rect width="{bw}" height="84" fill="{card_bg}" stroke="{border}" stroke-width="1" rx="8"/>
+      <text x="12" y="25" font-size="12" font-weight="600" fill="{text_primary}">{r_name}</text>
+      {star_svg}
+      <text x="12" y="45" font-size="9.5" font-weight="400" fill="{text_secondary}">{r_desc}</text>
+      
+      <!-- Tech Badge -->
+      <rect x="12" y="57" width="{tag_w}" height="17" fill="{inner_bg}" rx="4"/>
+      <text x="{12 + tag_w/2}" y="69" text-anchor="middle" font-size="8.5" font-weight="500" fill="{text_tertiary}">{r_stack}</text>
     </g>
 """
 
     svg += f"""  </g>
 
   <!-- ==================== FOOTER ==================== -->
-  <g class="fade-in delay-3" font-size="8.5" fill="{text_dim}">
-    <line x1="24" y1="334" x2="826" y2="334" stroke="{border}" stroke-width="0.8"/>
+  <g class="fade-in delay-3">
+    <line x1="24" y1="346" x2="826" y2="346" stroke="{border}" stroke-width="1"/>
     
-    <text x="28" y="348">ENV: {system_env}</text>
-    <text x="425" y="348" text-anchor="middle">LOC: {location} ({coordinates})</text>
-    <text x="822" y="348" text-anchor="end">SYS.SYNC: {now_str} <tspan class="cursor" fill="{accent}">█</tspan></text>
+    <text x="28" y="364" font-size="10" font-weight="400" fill="{text_tertiary}">{affiliation} · {location}</text>
+    <text x="822" y="364" text-anchor="end" font-size="10" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
   </g>
 </svg>
 """
