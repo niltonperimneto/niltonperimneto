@@ -1,12 +1,10 @@
 <div align="center">
-  <p>
-    <img src="https://img.shields.io/badge/Rust-090a0d?style=flat-square&logo=rust&logoColor=white" alt="Rust" />
-    <img src="https://img.shields.io/badge/TypeScript-090a0d?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
-    <img src="https://img.shields.io/badge/Python-090a0d?style=flat-square&logo=python&logoColor=white" alt="Python" />
-    <img src="https://img.shields.io/badge/C-090a0d?style=flat-square&logo=c&logoColor=white" alt="C" />
-    <img src="https://img.shields.io/badge/C%2B%2B-090a0d?style=flat-square&logo=c%2B%2B&logoColor=white" alt="C++" />
-    <img src="https://img.shields.io/badge/Assembly-090a0d?style=flat-square&logo=assemblyscript&logoColor=white" alt="Assembly" />
-  </p>
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="./assets/stack-badges-light.svg">
+    <img src="./assets/stack-badges-dark.svg" width="850" alt="My Stack">
+  </picture>
+
+  <br/>
 
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="./assets/zed-card-light.svg">
