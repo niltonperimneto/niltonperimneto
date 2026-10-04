@@ -142,7 +142,6 @@ def generate_svg(theme="dark", data=None, config=None):
         accent = "#ffffff"
         accent_stroke = "#e5e7eb"
         accent_fill_opacity = 0.12
-        dot_color = "#9ca3af"
     else:
         bg = "#ffffff"
         card_bg = "#f8fafc"
@@ -155,7 +154,6 @@ def generate_svg(theme="dark", data=None, config=None):
         accent = "#0f172a"
         accent_stroke = "#1e293b"
         accent_fill_opacity = 0.08
-        dot_color = "#475569"
 
     total_repos = data.get("repositories", {}).get("totalCount", 30)
     cal = data.get("contributionsCollection", {}).get("contributionCalendar", {})
@@ -216,6 +214,12 @@ def generate_svg(theme="dark", data=None, config=None):
     tagline = xesc(config.get("tagline", "Not a Programmer, just a historian."))
     affiliation = xesc(config.get("affiliation", "Universidade Federal de Goiás"))
     location = xesc(config.get("location", "Goiás, Brazil"))
+    
+    # Employment Status: Unemployed / Seeking Employment
+    emp_status_raw = config.get("employment_status", "Seeking Employment · Open to Work")
+    employment_status = xesc(emp_status_raw)
+    badge_w = max(205, len(emp_status_raw) * 6.8 + 34)
+    badge_x = 826 - badge_w
 
     # SVG Construction - strictly sharp angles (no rx / ry, no circles)
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 380" width="100%" height="100%">
@@ -285,10 +289,10 @@ def generate_svg(theme="dark", data=None, config=None):
     <text x="70" y="36" font-size="15" font-weight="600" fill="{text_primary}" letter-spacing="-0.01em">{display_name}</text>
     <text x="70" y="51" font-size="11" font-weight="400" fill="{text_secondary}">{tagline}</text>
 
-    <!-- Status Badge (Sharp Box) -->
-    <rect x="636" y="25" width="190" height="28" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
-    <rect x="649" y="36" width="6" height="6" fill="{dot_color}"/>
-    <text x="664" y="43" font-size="11" font-weight="500" fill="{text_secondary}">Systems &amp; Open Source</text>
+    <!-- Employment Status Badge (Sharp Box) -->
+    <rect x="{badge_x:.1f}" y="25" width="{badge_w:.1f}" height="28" fill="{card_bg}" stroke="{border}" stroke-width="1"/>
+    <rect x="{badge_x + 12:.1f}" y="36" width="6" height="6" fill="{text_primary}"/>
+    <text x="{badge_x + 26:.1f}" y="43" font-size="10.5" font-weight="600" fill="{text_primary}">{employment_status}</text>
 
     <!-- Header Divider -->
     <line x1="24" y1="72" x2="826" y2="72" stroke="{border}" stroke-width="1"/>
@@ -439,7 +443,7 @@ def generate_svg(theme="dark", data=None, config=None):
   <g class="fade-in delay-3">
     <line x1="24" y1="346" x2="826" y2="346" stroke="{border}" stroke-width="1"/>
     
-    <text x="28" y="364" font-size="10" font-weight="400" fill="{text_tertiary}">{affiliation} · {location}</text>
+    <text x="28" y="364" font-size="10" font-weight="400" fill="{text_tertiary}">{affiliation} · {location} · {employment_status}</text>
     <text x="822" y="364" text-anchor="end" font-size="10" font-weight="400" fill="{text_tertiary}">Updated via GitHub Actions · SVG Telemetry</text>
   </g>
 </svg>

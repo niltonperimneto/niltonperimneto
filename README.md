@@ -11,6 +11,7 @@
 
 ### About & Focus
 
+- **Employment**: Unemployed · Actively seeking employment (Open to Work)
 - **Affiliation**: Universidade Federal de Goiás (UFG)
 - **Location**: Goiás, Brazil
 - **Core Technologies**: Rust · TypeScript · Python · C · C++ · Assembly
