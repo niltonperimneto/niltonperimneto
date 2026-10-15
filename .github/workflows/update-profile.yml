@@ -2,10 +2,13 @@ name: Update Profile Telemetry
 
 on:
   schedule:
-    # Run once every 24 hours at midnight UTC
-    - cron: '0 0 * * *'
+    # Off-peak UTC (00:17 BRT) to avoid midnight GitHub Actions queue congestion
+    - cron: '17 3 * * *'
   workflow_dispatch:
   push:
+    branches:
+      - main
+      - master
     paths:
       - 'config.json'
       - 'generator/**'
@@ -14,32 +17,48 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: profile-telemetry-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   update-svg:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
-          python-version: '3.11'
+          python-version: '3.13'
 
-      - name: Generate Monochrome SVGs
+      - name: Generate & Validate SVGs
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           python3 generator/generate.py
+          python3 -c '
+          import glob, xml.etree.ElementTree as ET
+          files = glob.glob("assets/*.svg")
+          assert files, "No SVG files found in assets/!"
+          for f in files:
+              ET.parse(f)
+              print(f"Validated XML: {f}")
+          '
 
       - name: Commit and push if changed
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/*.svg
           if git diff --staged --quiet; then
             echo "No telemetry changes detected."
           else
             git commit -m "chore: sync profile telemetry [skip ci]"
-            git push
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
