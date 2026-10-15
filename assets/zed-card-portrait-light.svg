@@ -292,7 +292,7 @@
   </g>
 
   <!-- FOOTER -->
-  <g class="fade-in d4" font-size="8" font-weight="500" fill="var(--fg-dim)" class="mono">
+  <g class="fade-in d4 mono" font-size="8" font-weight="500" fill="var(--fg-dim)">
     <text x="18" y="560">Goiás, Brazil</text>
     <text x="382" y="560" text-anchor="end">LIVE TELEMETRY</text>
   </g>

@@ -198,16 +198,22 @@
     <g>
       <rect x="482" y="179" width="8" height="8" rx="1.5" fill="var(--c1)"/>
       <text x="496" y="186" font-size="9.5" font-weight="500" fill="var(--fg)">Drivers &amp; Low-Level</text>
+      <rect x="652" y="181" width="64" height="4" rx="2" fill="var(--inner)"/>
+      <rect x="652" y="181" width="28" height="4" rx="2" fill="var(--c1)"/>
       <text x="760" y="186" text-anchor="end" font-size="9.5" font-weight="700" fill="var(--fg)" class="mono">45%</text>
     </g>
     <g>
       <rect x="482" y="195" width="8" height="8" rx="1.5" fill="var(--c2)"/>
       <text x="496" y="202" font-size="9.5" font-weight="500" fill="var(--fg)">User Interface / GUI</text>
+      <rect x="652" y="197" width="64" height="4" rx="2" fill="var(--inner)"/>
+      <rect x="652" y="197" width="22" height="4" rx="2" fill="var(--c2)"/>
       <text x="760" y="202" text-anchor="end" font-size="9.5" font-weight="700" fill="var(--fg)" class="mono">35%</text>
     </g>
     <g>
       <rect x="482" y="211" width="8" height="8" rx="1.5" fill="var(--c3)"/>
       <text x="496" y="218" font-size="9.5" font-weight="500" fill="var(--fg)">Systems &amp; Daemons</text>
+      <rect x="652" y="213" width="64" height="4" rx="2" fill="var(--inner)"/>
+      <rect x="652" y="213" width="12" height="4" rx="2" fill="var(--c3)"/>
       <text x="760" y="218" text-anchor="end" font-size="9.5" font-weight="700" fill="var(--fg)" class="mono">20%</text>
     </g>
   </g>
@@ -334,7 +340,7 @@
   </g>
 
   <!-- MINIMAL FOOTER -->
-  <g class="fade-in d4" font-size="8.5" font-weight="500" fill="var(--fg-dim)" class="mono">
+  <g class="fade-in d4 mono" font-size="8.5" font-weight="500" fill="var(--fg-dim)">
     <text x="26" y="504">Goiás, Brazil</text>
     <text x="774" y="504" text-anchor="end">LIVE TELEMETRY</text>
   </g>
