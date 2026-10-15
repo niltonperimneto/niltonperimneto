@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Card Preview</title>
+  <style>
+    :root {
+      --bg: #191919;
+      --card-bg: #202020;
+      --border: #303030;
+      --text: #dededb;
+      --shadow: rgba(0, 0, 0, 0.5);
+    }
+
+    [data-theme="light"] {
+      --bg: #fafaf8;
+      --card-bg: #f1f1ee;
+      --border: #ddddd7;
+      --text: #30302d;
+      --shadow: rgba(0, 0, 0, 0.06);
+    }
+
+    * {
+      border-radius: 0 !important;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 30px 16px;
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: background-color 0.15s ease, color 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .toolbar-wrapper {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .toolbar-group {
+      display: flex;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+    }
+
+    .toolbar-group button {
+      background: none;
+      border: none;
+      border-right: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 400;
+      font-size: 12.5px;
+      cursor: pointer;
+      padding: 8px 16px;
+      transition: all 0.15s ease;
+    }
+
+    .toolbar-group button:last-child {
+      border-right: none;
+    }
+
+    .toolbar-group button.active, .toolbar-group button:hover {
+      background: var(--border);
+    }
+
+    .preview-stage {
+      max-width: 800px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      transition: max-width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .preview-stage.mobile-mode {
+      max-width: 375px;
+    }
+
+    .banner-preview {
+      width: 100%;
+      text-align: center;
+    }
+
+    .banner-preview img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <div class="toolbar-wrapper">
+    <!-- Theme Toggle -->
+    <div class="toolbar-group">
+      <button id="btn-dark" class="active" onclick="setTheme('dark')">Dark Mode</button>
+      <button id="btn-light" onclick="setTheme('light')">Light Mode</button>
+    </div>
+
+    <!-- Viewport Size Simulator (Wide vs Portrait) -->
+    <div class="toolbar-group">
+      <button id="btn-desk" class="active" onclick="setViewMode('desktop')">Desktop View (Wide 800px)</button>
+      <button id="btn-mobi" onclick="setViewMode('mobile')">Mobile View (Portrait 375px)</button>
+    </div>
+  </div>
+
+  <div id="preview-stage" class="preview-stage">
+    <div class="banner-preview">
+      <picture id="profile-picture">
+        <source id="source-wide-light" media="(min-width: 600px) and (prefers-color-scheme: light)" srcset="./assets/zed-card-wide-light.svg">
+        <source id="source-wide-dark" media="(min-width: 600px) and (prefers-color-scheme: dark)" srcset="./assets/zed-card-wide-dark.svg">
+        <source id="source-portrait-light" media="(prefers-color-scheme: light)" srcset="./assets/zed-card-portrait-light.svg">
+        <source id="source-portrait-dark" media="(prefers-color-scheme: dark)" srcset="./assets/zed-card-portrait-dark.svg">
+        <img id="card-img" src="./assets/zed-card-wide-dark.svg" width="100%" alt="Generated profile card">
+      </picture>
+    </div>
+  </div>
+
+  <script>
+    let currentTheme = 'dark';
+    let currentViewMode = 'desktop';
+
+    function updateCard() {
+      const cardImg = document.getElementById('card-img');
+      const isMobile = (currentViewMode === 'mobile');
+      
+      const targetSrc = isMobile
+        ? (currentTheme === 'light' ? './assets/zed-card-portrait-light.svg' : './assets/zed-card-portrait-dark.svg')
+        : (currentTheme === 'light' ? './assets/zed-card-wide-light.svg' : './assets/zed-card-wide-dark.svg');
+
+      cardImg.src = targetSrc;
+      
+      // Update all source tags so the manual preview selection is respected regardless of OS color scheme
+      document.getElementById('source-wide-light').srcset = targetSrc;
+      document.getElementById('source-wide-dark').srcset = targetSrc;
+      document.getElementById('source-portrait-light').srcset = targetSrc;
+      document.getElementById('source-portrait-dark').srcset = targetSrc;
+    }
+
+    function setTheme(theme) {
+      currentTheme = theme;
+      document.body.setAttribute('data-theme', theme);
+      
+      document.getElementById('btn-dark').classList.toggle('active', theme === 'dark');
+      document.getElementById('btn-light').classList.toggle('active', theme === 'light');
+
+      updateCard();
+    }
+
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      const stage = document.getElementById('preview-stage');
+      const isMobile = (mode === 'mobile');
+      
+      stage.classList.toggle('mobile-mode', isMobile);
+      document.getElementById('btn-desk').classList.toggle('active', !isMobile);
+      document.getElementById('btn-mobi').classList.toggle('active', isMobile);
+
+      updateCard();
+    }
+  </script>
+</body>
+</html>

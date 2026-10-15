@@ -1,0 +1,58 @@
+{
+  "username": "octocat",
+  "name": "Your Name",
+  "tagline": "A short introduction to your work.",
+  "location": "Your city, country",
+  "employment_status": "Open to Work",
+  "avatar_url": "",
+  "footer_joke": "'Tis but a scratch.",
+  "stack_languages": [
+    {
+      "name": "Python",
+      "slug": "python"
+    },
+    {
+      "name": "TypeScript",
+      "slug": "typescript"
+    },
+    {
+      "name": "Rust",
+      "slug": "rust"
+    }
+  ],
+  "platforms": [
+    {
+      "name": "Linux",
+      "slug": "linux"
+    },
+    {
+      "name": "Web",
+      "slug": "web"
+    }
+  ],
+  "project_scopes": [
+    {
+      "name": "Application development",
+      "label": "Apps",
+      "pct": 60
+    },
+    {
+      "name": "Open source",
+      "label": "OSS",
+      "pct": 40
+    }
+  ],
+  "featured_repos": [],
+  "appearance": {
+    "dark": {
+      "c1": "#a5b8cc"
+    },
+    "light": {
+      "c1": "#526d8a"
+    }
+  },
+  "labels": {
+    "file": "~/about-me.md",
+    "projects": "Selected projects"
+  }
+}

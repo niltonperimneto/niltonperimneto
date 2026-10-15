@@ -3,53 +3,86 @@
   "name": "NILTON PERIM NETO",
   "tagline": "Not a Programmer, just a historian.",
   "location": "Goiás, Brazil",
-  "affiliation": "Universidade Federal de Goiás",
   "employment_status": "Seeking Employment · Open to Work",
-  "system_env": "x86_64 // ARM64 // Linux & macOS",
-  "coordinates": "-16.6869° S, 49.2648° W",
   "platforms": [
-    { "name": "Linux", "badge": "Kernel · Drivers" },
-    { "name": "macOS", "badge": "Darwin · Systems" },
-    { "name": "Web", "badge": "Wasm · Modern UI" }
+    {
+      "name": "Linux",
+      "slug": "linux"
+    },
+    {
+      "name": "macOS",
+      "slug": "macos"
+    },
+    {
+      "name": "Web",
+      "slug": "web"
+    }
   ],
   "project_scopes": [
-    { "name": "Drivers & Low-Level", "pct": 45 },
-    { "name": "User Interface / GUI", "pct": 35 },
-    { "name": "Systems & Daemons", "pct": 20 }
+    {
+      "name": "Drivers & Low-Level",
+      "pct": 45,
+      "label": "Drivers"
+    },
+    {
+      "name": "User Interface / GUI",
+      "pct": 35,
+      "label": "UI"
+    },
+    {
+      "name": "Systems & Daemons",
+      "pct": 20,
+      "label": "Systems"
+    }
   ],
   "stack_languages": [
-    { "name": "Rust", "slug": "rust" },
-    { "name": "TypeScript", "slug": "typescript" },
-    { "name": "Python", "slug": "python" },
-    { "name": "C", "slug": "c" },
-    { "name": "C++", "slug": "cplusplus" },
-    { "name": "Assembly", "slug": "assemblyscript" }
+    {
+      "name": "Rust",
+      "slug": "rust"
+    },
+    {
+      "name": "TypeScript",
+      "slug": "typescript"
+    },
+    {
+      "name": "Python",
+      "slug": "python"
+    },
+    {
+      "name": "C",
+      "slug": "c"
+    },
+    {
+      "name": "C++",
+      "slug": "cplusplus"
+    },
+    {
+      "name": "Assembly",
+      "slug": "assemblyscript"
+    }
   ],
   "featured_repos": [
     {
       "name": "twister",
-      "desc": "Desktop-agnostic GUI for Linux gaming mice",
-      "stack": "TS / Linux",
-      "stars": 11
+      "stack": "TS / Linux"
     },
     {
       "name": "neocalc-core",
-      "desc": "Rust math engine judging your skills",
-      "stack": "Rust",
-      "stars": 1
+      "stack": "Rust"
     },
     {
       "name": "libratbag-rs",
-      "desc": "DBus daemon for high-end gaming mice",
-      "stack": "Rust / DBus",
-      "stars": 1
+      "stack": "Rust / DBus"
     },
     {
       "name": "lemurs",
-      "desc": "Customizable TUI display & login manager",
-      "stack": "Rust / TUI",
-      "stars": 0
+      "stack": "Rust / TUI"
     }
   ],
-  "exclude_repos_from_stats": ["winecx", "mesa", "dxmt"]
+  "footer_joke": "'Tis but a scratch.",
+  "appearance": {
+    "font_family": "ui-monospace, \"SFMono-Regular\", \"SF Mono\", Menlo, Consolas, \"Liberation Mono\", monospace",
+    "dark": {},
+    "light": {}
+  }
 }
