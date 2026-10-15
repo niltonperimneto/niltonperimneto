@@ -2,7 +2,6 @@
 import base64
 import html
 import json
-import math
 import os
 import subprocess
 import urllib.request
@@ -29,7 +28,7 @@ def truncate(text, max_len=36):
     return text if len(text) <= max_len else text[: max_len - 1].rstrip() + "…"
 
 
-# Vector paths (24x24 viewBox)
+# Canonical 24x24 Simple Icons Vector Paths
 C_HEX_PATH = "M11.5 2.1a1 1 0 0 1 1 0l7.8 4.5a1 1 0 0 1 .5.87v9.06a1 1 0 0 1-.5.87l-7.8 4.5a1 1 0 0 1-1 0l-7.8-4.5a1 1 0 0 1-.5-.87V7.47a1 1 0 0 1 .5-.87z M12 6.5a5.5 5.5 0 1 0 3.89 9.39l-1.42-1.42A3.5 3.5 0 1 1 12 8.5c.97 0 1.85.39 2.47 1.03l1.42-1.42A5.47 5.47 0 0 0 12 6.5z"
 CPP_HEX_PATH = "M11.5 2.1a1 1 0 0 1 1 0l7.8 4.5a1 1 0 0 1 .5.87v9.06a1 1 0 0 1-.5.87l-7.8 4.5a1 1 0 0 1-1 0l-7.8-4.5a1 1 0 0 1-.5-.87V7.47a1 1 0 0 1 .5-.87z M10.5 7a4.5 4.5 0 1 0 3.18 7.68l-1.42-1.42A2.5 2.5 0 1 1 10.5 9c.69 0 1.32.28 1.77.73l1.42-1.42A4.47 4.47 0 0 0 10.5 7z M15 11h1v-1h1v1h1v1h-1v1h-1v-1h-1z M19 11h1v-1h1v1h1v1h-1v1h-1v-1h-1z"
 
@@ -43,9 +42,11 @@ ICONS = {
     "assembly": "M0 0v24h24V0h-9.225c0 1.406-1.04 2.813-2.756 2.813A2.766 2.766 0 019.234 0zm18.204 10.947c.707 0 1.314.137 1.82.412.517.264.96.717 1.33 1.361l-1.726 1.108c-.19-.338-.395-.58-.617-.728a1.422 1.422 0 00-.807-.222c-.327 0-.586.09-.776.27a.896.896 0 00-.285.68c0 .337.106.596.317.775.222.17.57.36 1.045.57l.554.238c.474.2.891.411 1.25.633.37.21.675.453.918.728.253.264.443.57.57.918.137.337.206.738.206 1.203a3 3 0 01-.285 1.33c-.18.38-.433.701-.76.965a3.419 3.419 0 01-1.171.601c-.443.127-.929.19-1.456.19a5.31 5.31 0 01-1.41-.174 4.624 4.624 0 01-1.139-.475 3.922 3.922 0 01-.886-.712 4.48 4.48 0 01-.602-.902L16.1 18.67c.242.39.527.712.855.966.337.253.78.38 1.33.38.463 0 .827-.1 1.091-.301.275-.211.412-.475.412-.792 0-.38-.143-.664-.428-.854-.285-.19-.68-.396-1.187-.618l-.554-.237a8.12 8.12 0 01-1.092-.554 3.64 3.64 0 01-.839-.696 2.887 2.887 0 01-.538-.903 3.375 3.375 0 01-.19-1.187c0-.411.074-.796.222-1.155a2.91 2.91 0 01.649-.934c.285-.264.628-.47 1.029-.617.4-.148.849-.222 1.345-.222zm-8.796.032h.19l4.922 10.858h-2.327l-.506-1.219H7.318l-.506 1.219H4.675zm.063 3.988a22.21 22.21 0 01-.206.697l-.205.649a6.979 6.979 0 01-.222.585l-.776 1.868h2.834l-.776-1.868a15.492 15.492 0 01-.237-.633 23.741 23.741 0 01-.412-1.298z",
     "webassembly": "M14.745 0c0 .042 0 .085 0 .129 0 1.52-1.232 2.752-2.752 2.752-1.52 0-2.752-1.232-2.752-2.752 0-.045 0-.087 0-.129H0v24h24V0H14.745zM11.454 21.431l-1.169-5.783h-.02l-1.264 5.783H7.39l-1.824-8.497h1.59l1.088 5.783h.02l1.311-5.783h1.487l1.177 5.854h.02l1.242-5.854h1.561l-2.027 8.497H11.454zM20.209 21.431l-.542-1.891h-2.861l-0.417 1.891h-1.59l2.056-8.497h2.509l2.5 8.497H20.209zM17.812 15.028l-.694 3.118h2.159l-.796-3.118H17.812z",
     "swift": "M21.9 16.4c-.1-.2-.2-.5-.3-.7 1.3-2.9.6-6.6-1.9-9.4-2.1-2.3-5.2-3.4-8.1-3 3.2 2.1 4.5 5.4 3.7 8.1-1.2-1.6-3.7-3.9-6.6-6.2-.9-.7-1.9-1.5-2.8-2.4-.2 1.8.4 3.9 1.6 5.6-1.5-.8-3.4-2.1-4.8-3.7-.3 2.5.8 5.2 2.9 6.9-1.2 0-2.5-.3-3.6-1 1 2.5 3.5 4.3 6.5 4.5-1.9 1.3-4.3 1.7-6.6 1.2 2.6 2 5.9 2.9 9.2 2.6 3.5-.3 6.7-2 8.7-4.8 1.2.9 2.7 1.2 3.8.7-.6-.7-1.3-1.5-1.7-2.4z",
-    # Platform Icons
-    "linux": "M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2v10h14V7H5zm2 2l3 3-3 3v-1.5l1.5-1.5L7 10.5V9zm4 5h4v1.5h-4V14z",
-    "macos": "M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.33c.64-.78 1.08-1.86.96-2.94-.93.04-2.06.62-2.72 1.4-.58.68-1.1 1.79-.96 2.84 1.04.08 2.08-.52 2.72-1.3",
+    # Official Simple Icons Tux (siLinux) - 24x24 viewBox
+    "linux": "M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 00-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139zm.529 3.405h.013c.213 0 .396.062.584.198.19.135.33.332.438.533.105.259.158.459.166.724 0-.02.006-.04.006-.06v.105a.086.086 0 01-.004-.021l-.004-.024a1.807 1.807 0 01-.15.706.953.953 0 01-.213.335.71.71 0 01-.088.069c-.104.058-.198.064-.284.134-.105.058-.19.14-.279.199-.064.059-.114.063-.188.063-.058 0-.114-.004-.199-.063-.069-.06-.14-.141-.213-.199-.07-.07-.145-.14-.21-.2-.064-.064-.114-.134-.188-.2a.603.603 0 01-.066-.135 1.832 1.832 0 01-.121-.465 2.022 2.022 0 01-.015-.53c.014-.259.06-.466.166-.725.104-.2.244-.398.438-.533.184-.136.364-.198.584-.198zm-3.628.266h.003c.134 0 .273.063.4.135.121.069.209.202.288.334.079.134.129.333.155.531.023.199.014.4-.015.597-.025.203-.088.401-.169.535-.08.135-.181.269-.299.334-.12.063-.245.134-.384.134-.135 0-.264-.071-.384-.134-.114-.065-.21-.199-.29-.334-.081-.134-.139-.332-.168-.535-.026-.197-.035-.398-.012-.597.026-.198.076-.397.156-.531.078-.132.166-.265.288-.334.122-.072.26-.135.398-.135zm1.933 2.796c.299 0 .593.065.918.198.329.135.652.333.946.533.293.199.558.397.737.601.181.198.27.398.27.601 0 .198-.089.397-.299.531-.21.135-.492.269-.861.4-.369.135-.813.268-1.318.334-.506.063-1.076.063-1.678-.003-.598-.066-1.11-.199-1.503-.331-.391-.135-.685-.269-.864-.403-.181-.134-.269-.333-.269-.531 0-.203.088-.403.269-.601.18-.204.444-.402.768-.601.324-.2.678-.398 1.036-.533.359-.133.719-.198 1.018-.198zm-1.622 3.597c.509.106 1.077.172 1.681.198.604.026 1.174-.003 1.679-.066.506-.065.95-.198 1.318-.334.369-.132.651-.266.861-.4.11-.076.191-.161.249-.254.349.503.758 1.045 1.158 1.622.616.89 1.189 1.884 1.547 2.918.359 1.033.504 2.106.257 3.109-.064.259-.166.519-.288.765-.181-.026-.378-.026-.578 0-.414.063-.858.268-1.263.533-.405.266-.768.601-1.018.932-.249.334-.384.668-.384.933 0 .203.058.334.14.466.08.135.199.202.329.268-.564.026-1.158-.035-1.737-.066-.578-.029-1.144-.029-1.678.003-.535.029-1.041.097-1.474.2-.433.099-.796.265-1.048.463-.058-.2-.168-.463-.358-.731-.191-.266-.449-.533-.768-.797-.319-.268-.685-.466-1.076-.601-.391-.135-.796-.199-1.168-.135-.089-.398-.114-.832-.066-1.298.05-.466.169-.965.358-1.465.379-1.002 1.018-2.036 1.681-2.927.663-.891 1.348-1.644 1.724-2.299z",
+    # Official Simple Icons Apple (siApple) - 24x24 viewBox (Properly centered leaf & lobes)
+    "macos": "M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701",
+    # Precision Meridian Grid Globe
     "web": "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm7.9 9h-3.05a15.7 15.7 0 0 0-1.12-5.02A8.03 8.03 0 0 1 19.9 11zm-7.9 9c-.83 0-2.12-1.84-2.66-5h5.32c-.54 3.16-1.83 5-2.66 5zm-2.83-7a13.8 13.8 0 0 1 0-2h5.66a13.8 13.8 0 0 1 0 2H9.17zM4.1 11a8.03 8.03 0 0 1 4.17-5.02A15.7 15.7 0 0 0 7.15 11H4.1zm7.9-7c.83 0 2.12 1.84 2.66 5H9.34c.54-3.16 1.83-5 2.66-5zM4.1 13h3.05c.2 1.78.6 3.5 1.12 5.02A8.03 8.03 0 0 1 4.1 13zm11.63 5.02c.52-1.52.92-3.24 1.12-5.02h3.05a8.03 8.03 0 0 1-4.17 5.02z",
 }
 
@@ -54,7 +55,7 @@ def fetch_avatar_data_uri(avatar_url):
     if not avatar_url:
         return ""
     try:
-        req = urllib.request.Request(avatar_url, headers={"User-Agent": "ProfileGenerator/2.1"})
+        req = urllib.request.Request(avatar_url, headers={"User-Agent": "ProfileGenerator/3.0"})
         with urllib.request.urlopen(req, timeout=5) as resp:
             data = resp.read()
             mime = resp.headers.get_content_type()
@@ -68,7 +69,7 @@ def fetch_avatar_data_uri(avatar_url):
 def fetch_public_contributions(username):
     try:
         url = f"https://github-contributions-api.jogruber.de/v4/{username}?y=last"
-        req = urllib.request.Request(url, headers={"User-Agent": "ProfileGenerator/2.1"})
+        req = urllib.request.Request(url, headers={"User-Agent": "ProfileGenerator/3.0"})
         with urllib.request.urlopen(req, timeout=6) as resp:
             payload = json.loads(resp.read().decode("utf-8"))
             days = payload.get("contributions", [])
@@ -134,7 +135,7 @@ def fetch_github_data(username):
     except Exception:
         pass
 
-    # 2. Try GITHUB_TOKEN (CI / GitHub Actions environment)
+    # 2. Try GITHUB_TOKEN
     token = os.environ.get("GITHUB_TOKEN")
     if token:
         try:
@@ -144,7 +145,7 @@ def fetch_github_data(username):
                 headers={
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json",
-                    "User-Agent": "ProfileGenerator/2.1",
+                    "User-Agent": "ProfileGenerator/3.0",
                 },
             )
             with urllib.request.urlopen(req, timeout=8) as resp:
@@ -155,7 +156,7 @@ def fetch_github_data(username):
         except Exception as e:
             print(f"Warning: GraphQL request with GITHUB_TOKEN failed: {e}")
 
-    # 3. Public Unauthenticated Contributions Fallback
+    # 3. Public Unauthenticated Fallback
     cal = fetch_public_contributions(username)
     if not cal:
         synth = [
@@ -202,104 +203,86 @@ def extract_weekly_activity(data):
     return counts, total
 
 
-def build_smooth_oscilloscope(points, y_base, y_top):
+def build_angular_oscilloscope(points, y_base):
+    """
+    Constructs a hard-angled linear vector trace ('L') matching Zed's crisp geometry.
+    """
     if not points:
         return "", ""
-    if len(points) == 1:
-        p = f"M {points[0][0]:.1f} {points[0][1]:.1f}"
-        return p, p
-
     d = [f"M {points[0][0]:.1f} {points[0][1]:.1f}"]
-    n = len(points)
-    tension = 0.22
-
-    for i in range(n - 1):
-        p0 = points[max(i - 1, 0)]
-        p1 = points[i]
-        p2 = points[i + 1]
-        p3 = points[min(i + 2, n - 1)]
-
-        cp1x = p1[0] + (p2[0] - p0[0]) * tension
-        cp1y = max(y_top, min(y_base, p1[1] + (p2[1] - p0[1]) * tension))
-
-        cp2x = p2[0] - (p3[0] - p1[0]) * tension
-        cp2y = max(y_top, min(y_base, p2[1] - (p3[1] - p1[1]) * tension))
-
-        d.append(f"C {cp1x:.1f} {cp1y:.1f}, {cp2x:.1f} {cp2y:.1f}, {p2[0]:.1f} {p2[1]:.1f}")
-
+    for px, py in points[1:]:
+        d.append(f"L {px:.1f} {py:.1f}")
     stroke_path = " ".join(d)
     area_path = f"{stroke_path} L {points[-1][0]:.1f} {y_base:.1f} L {points[0][0]:.1f} {y_base:.1f} Z"
     return stroke_path, area_path
 
 
-def generate_donut_gauge_svg(cx, cy, r, slices):
+def generate_segmented_bar_svg(x, y, w, h, slices):
+    """
+    Renders a sharp, segmented horizontal telemetry bar instead of a soft circular pie/donut.
+    """
     total = sum(s.get("pct", 0) for s in slices) or 100
-    circumference = 2 * math.pi * r
     color_vars = ["var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)"]
+    gap = 3
+    active_slices = [s for s in slices if s.get("pct", 0) > 0]
+    avail_w = w - gap * max(0, len(active_slices) - 1)
 
-    elements = [
-        f'    <circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="var(--inner)" stroke-width="7"/>'
+    rects = [
+        f'    <rect x="{x}" y="{y}" width="{w}" height="{h}" fill="var(--inner)" stroke="var(--border)" stroke-width="0.75"/>'
     ]
-
-    offset = 0.0
-    gap = 2.5 if len([s for s in slices if s.get("pct", 0) > 0]) > 1 else 0
-
-    for idx, s in enumerate(slices):
+    curr_x = float(x)
+    for idx, s in enumerate(active_slices):
         pct = s.get("pct", 0)
-        if pct <= 0:
-            continue
-        seg_len = max(0.5, (pct / total) * circumference - gap)
+        seg_w = max(4.0, (pct / total) * avail_w)
+        if idx == len(active_slices) - 1:
+            seg_w = max(4.0, (x + w) - curr_x)
         c_var = color_vars[idx % len(color_vars)]
-        elements.append(
-            f'    <circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{c_var}" '
-            f'stroke-width="7" stroke-dasharray="{seg_len:.2f} {circumference:.2f}" '
-            f'stroke-dashoffset="{-offset:.2f}" transform="rotate(-90 {cx} {cy})"/>'
+        rects.append(
+            f'    <rect x="{curr_x:.1f}" y="{y}" width="{seg_w:.1f}" height="{h}" fill="{c_var}"/>'
         )
-        offset += (pct / total) * circumference
+        curr_x += seg_w + gap
 
-    elements.append(
-        f'    <circle cx="{cx}" cy="{cy}" r="{r - 6.5:.1f}" fill="none" stroke="var(--border-sub)" stroke-width="0.75"/>'
-    )
-    elements.append(f'    <circle cx="{cx}" cy="{cy}" r="2.5" fill="var(--c1)"/>')
-    return "\n".join(elements)
+    return "\n".join(rects)
 
 
 def get_theme_css(forced_theme=None):
+    # Zed Default Dark (zed-onedark / carbon-industrial palette)
     dark_vars = """
-        --bg: #090a0d;
-        --card: #111318;
-        --inner: #171a21;
-        --border: #262a34;
-        --border-sub: #1b1f27;
-        --fg: #f3f4f6;
-        --fg-muted: #9ca3af;
-        --fg-dim: #6b7280;
-        --accent: #ffffff;
-        --accent-op1: 0.22;
-        --accent-op2: 0.05;
-        --c1: #f3f4f6;
-        --c2: #9ca3af;
-        --c3: #4b5563;
-        --c4: #374151;
-        --status: #10b981;
-    """
-    light_vars = """
-        --bg: #ffffff;
-        --card: #f8fafc;
-        --inner: #f1f5f9;
-        --border: #cbd5e1;
-        --border-sub: #e2e8f0;
-        --fg: #0f172a;
-        --fg-muted: #475569;
-        --fg-dim: #94a3b8;
-        --accent: #0f172a;
-        --accent-op1: 0.16;
+        --bg: #090a0c;
+        --card: #101216;
+        --inner: #161920;
+        --border: #242933;
+        --border-sub: #1a1e26;
+        --fg: #dce0e5;
+        --fg-muted: #8b929e;
+        --fg-dim: #555c69;
+        --accent: #f3f4f6;
+        --accent-op1: 0.18;
         --accent-op2: 0.03;
-        --c1: #0f172a;
-        --c2: #475569;
-        --c3: #94a3b8;
-        --c4: #cbd5e1;
-        --status: #059669;
+        --c1: #f3f4f6;
+        --c2: #8b929e;
+        --c3: #434956;
+        --c4: #282d38;
+        --status: #22c55e;
+    """
+    # Zed Default Light
+    light_vars = """
+        --bg: #f5f6f8;
+        --card: #ffffff;
+        --inner: #eef0f4;
+        --border: #d0d5dd;
+        --border-sub: #e4e7ec;
+        --fg: #101828;
+        --fg-muted: #475467;
+        --fg-dim: #98a2b3;
+        --accent: #101828;
+        --accent-op1: 0.14;
+        --accent-op2: 0.02;
+        --c1: #101828;
+        --c2: #475467;
+        --c3: #98a2b3;
+        --c4: #d0d5dd;
+        --status: #16a34a;
     """
 
     if forced_theme == "light":
@@ -316,28 +299,28 @@ def get_theme_css(forced_theme=None):
     return f"""
       {theme_block}
       text {{
-        font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+        font-family: "JetBrains Mono", "Zed Mono", "SF Mono", "Fira Code", ui-monospace, -apple-system, monospace;
         -webkit-font-smoothing: antialiased;
-      }}
-      .mono {{
-        font-family: "JetBrains Mono", "SF Mono", "Fira Code", ui-monospace, monospace;
         font-variant-numeric: tabular-nums;
       }}
+      .sans {{
+        font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+      }}
       .draw-stroke {{
-        stroke-dasharray: 2400;
-        stroke-dashoffset: 2400;
-        animation: drawPath 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        stroke-dasharray: 2800;
+        stroke-dashoffset: 2800;
+        animation: drawPath 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }}
       .fade-in {{
         opacity: 0;
-        animation: fadeIn 0.45s ease forwards;
+        animation: fadeIn 0.35s ease forwards;
       }}
-      .d1 {{ animation-delay: 0.06s; }}
-      .d2 {{ animation-delay: 0.12s; }}
-      .d3 {{ animation-delay: 0.18s; }}
-      .d4 {{ animation-delay: 0.24s; }}
+      .d1 {{ animation-delay: 0.05s; }}
+      .d2 {{ animation-delay: 0.10s; }}
+      .d3 {{ animation-delay: 0.15s; }}
+      .d4 {{ animation-delay: 0.20s; }}
       .pulse {{
-        animation: pulseRing 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        animation: pulseSq 2.2s steps(2, end) infinite;
         transform-box: fill-box;
         transform-origin: center;
       }}
@@ -345,12 +328,12 @@ def get_theme_css(forced_theme=None):
         to {{ stroke-dashoffset: 0; }}
       }}
       @keyframes fadeIn {{
-        from {{ opacity: 0; transform: translateY(2px); }}
-        to {{ opacity: 1; transform: translateY(0); }}
+        from {{ opacity: 0; }}
+        to {{ opacity: 1; }}
       }}
-      @keyframes pulseRing {{
-        0%, 100% {{ opacity: 0.25; transform: scale(1); }}
-        50% {{ opacity: 0.85; transform: scale(1.75); }}
+      @keyframes pulseSq {{
+        0%, 100% {{ opacity: 0.2; transform: scale(1); }}
+        50% {{ opacity: 0.9; transform: scale(1.8); }}
       }}
       @media (prefers-reduced-motion: reduce) {{
         .draw-stroke, .fade-in, .pulse {{ animation: none !important; opacity: 1 !important; stroke-dashoffset: 0 !important; }}
@@ -391,10 +374,11 @@ def generate_svg_wide(theme=None, data=None, config=None, avatar_data_uri=""):
     max_week = max(raw_max, 1)
     peak_idx = len(weekly_counts) - 1 - weekly_counts[::-1].index(raw_max)
 
-    wave_x = 40
-    wave_w = 720
-    wave_y_base = 344
-    wave_y_top = 278
+    # Wide Activity Rhythm coordinates
+    wave_x = 38
+    wave_w = 724
+    wave_y_base = 342
+    wave_y_top = 274
     wave_h = wave_y_base - wave_y_top
 
     n = len(weekly_counts)
@@ -408,17 +392,18 @@ def generate_svg_wide(theme=None, data=None, config=None, avatar_data_uri=""):
         py = wave_y_base - (norm * wave_h)
         points.append((px, py))
 
+        # Crisp rectangular histogram columns
         bar_h = max(2.0, norm * wave_h)
-        bar_op = 0.12 + (norm * 0.28)
+        bar_op = 0.10 + (norm * 0.22)
         bars_svg.append(
-            f'    <line x1="{px:.1f}" y1="{wave_y_base}" x2="{px:.1f}" y2="{wave_y_base - bar_h:.1f}" '
-            f'stroke="var(--fg-muted)" stroke-width="2" stroke-opacity="{bar_op:.2f}"/>'
+            f'    <rect x="{px - 2.2:.1f}" y="{wave_y_base - bar_h:.1f}" width="4.4" height="{bar_h:.1f}" '
+            f'fill="var(--fg-muted)" fill-opacity="{bar_op:.2f}"/>'
         )
 
-    stroke_d, area_d = build_smooth_oscilloscope(points, wave_y_base, wave_y_top)
+    stroke_d, area_d = build_angular_oscilloscope(points, wave_y_base)
     peak_x, peak_y = points[peak_idx]
     curr_x, curr_y = points[-1]
-    peak_label_x = max(wave_x + 28, min(wave_x + wave_w - 28, peak_x))
+    peak_label_x = max(wave_x + 24, min(wave_x + wave_w - 24, peak_x))
 
     stack_langs = config.get(
         "stack_languages",
@@ -460,58 +445,62 @@ def generate_svg_wide(theme=None, data=None, config=None, avatar_data_uri=""):
     emp_raw = config.get("employment_status", "Open to Work")
     if "·" in emp_raw:
         emp_raw = emp_raw.split("·")[-1].strip()
-    emp_status = xesc(emp_raw)
-    badge_w = max(110, len(emp_raw) * 6.5 + 34)
-    badge_x = 760 - badge_w
+    emp_status = xesc(emp_raw.upper())
+    badge_w = max(116, len(emp_raw) * 6.8 + 34)
+    badge_x = 762 - badge_w
 
     if avatar_data_uri:
-        avatar_svg = f"""      <clipPath id="avatarClipW"><rect x="38" y="26" width="44" height="44" rx="4"/></clipPath>
-      <image href="{avatar_data_uri}" x="38" y="26" width="44" height="44" clip-path="url(#avatarClipW)" preserveAspectRatio="xMidYMid slice"/>
-      <rect x="38" y="26" width="44" height="44" rx="4" fill="none" stroke="var(--border)" stroke-width="1"/>"""
+        avatar_svg = f"""      <image href="{avatar_data_uri}" x="36" y="26" width="44" height="44" preserveAspectRatio="xMidYMid slice"/>
+      <rect x="36" y="26" width="44" height="44" fill="none" stroke="var(--border)" stroke-width="1"/>"""
     else:
-        avatar_svg = """      <rect x="38" y="26" width="44" height="44" rx="4" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
-      <text x="60" y="53" text-anchor="middle" font-size="13" font-weight="700" fill="var(--fg)">NP</text>"""
+        avatar_svg = """      <rect x="36" y="26" width="44" height="44" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
+      <text x="58" y="53" text-anchor="middle" font-size="13" font-weight="700" fill="var(--fg)">NP</text>"""
 
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="100%" height="100%">
+    scope_bar_svg = generate_segmented_bar_svg(420, 174, 342, 10, project_scopes)
+
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 512" width="100%" height="100%">
   <defs>
     <style>{get_theme_css(theme)}</style>
     <linearGradient id="waveGradW" gradientUnits="userSpaceOnUse" x1="0" y1="{wave_y_top}" x2="0" y2="{wave_y_base}">
       <stop offset="0%" stop-color="var(--accent)" stop-opacity="var(--accent-op1)"/>
-      <stop offset="65%" stop-color="var(--accent)" stop-opacity="var(--accent-op2)"/>
+      <stop offset="70%" stop-color="var(--accent)" stop-opacity="var(--accent-op2)"/>
       <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.0"/>
     </linearGradient>
-    <pattern id="dotGridW" width="20" height="20" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="0.75" fill="var(--border)" opacity="0.55"/>
+    <pattern id="zedGridW" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--border-sub)" stroke-width="0.6" opacity="0.6"/>
     </pattern>
   </defs>
 
-  <rect width="800" height="520" rx="6" fill="var(--bg)"/>
-  <rect width="800" height="520" rx="6" fill="url(#dotGridW)"/>
-  <rect x="0.5" y="0.5" width="799" height="519" rx="5.5" fill="none" stroke="var(--border)" stroke-width="1"/>
+  <rect width="800" height="512" fill="var(--bg)"/>
+  <rect width="800" height="512" fill="url(#zedGridW)"/>
+  <rect x="0.5" y="0.5" width="799" height="511" fill="none" stroke="var(--border)" stroke-width="1"/>
 
-  <!-- BLOCK 1: HEADER -->
+  <!-- BLOCK 1: ZED STATUSBAR HEADER -->
   <g class="fade-in">
-    <rect x="24" y="16" width="752" height="64" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+    <rect x="20" y="16" width="760" height="64" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+    <!-- Zed active tab top accent line -->
+    <line x1="20" y1="16" x2="180" y2="16" stroke="var(--accent)" stroke-width="2"/>
 {avatar_svg}
-    <text x="96" y="44" font-size="15.5" font-weight="700" fill="var(--fg)" letter-spacing="-0.01em">{display_name}</text>
-    <text x="96" y="61" font-size="11" font-weight="400" fill="var(--fg-muted)">{tagline}</text>
+    <text x="94" y="44" font-size="15" font-weight="700" fill="var(--fg)" class="sans">{display_name}</text>
+    <text x="94" y="61" font-size="10.5" font-weight="400" fill="var(--fg-muted)">{tagline}</text>
 
-    <rect x="{badge_x:.1f}" y="34" width="{badge_w:.1f}" height="28" rx="4" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
-    <circle cx="{badge_x + 14:.1f}" cy="48" r="3.5" fill="var(--status)"/>
-    <circle cx="{badge_x + 14:.1f}" cy="48" r="3.5" fill="none" stroke="var(--status)" stroke-width="1" class="pulse"/>
-    <text x="{badge_x + 25:.1f}" y="52" font-size="10" font-weight="600" fill="var(--fg)">{emp_status}</text>
+    <rect x="{badge_x:.1f}" y="34" width="{badge_w:.1f}" height="28" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
+    <rect x="{badge_x + 11:.1f}" y="45" width="6" height="6" fill="var(--status)"/>
+    <rect x="{badge_x + 11:.1f}" y="45" width="6" height="6" fill="none" stroke="var(--status)" stroke-width="1" class="pulse"/>
+    <text x="{badge_x + 25:.1f}" y="52" font-size="9.5" font-weight="700" letter-spacing="0.04em" fill="var(--fg)">{emp_status}</text>
   </g>
 
-  <!-- BLOCK 2: STACK -->
+  <!-- BLOCK 2: STACK PANE -->
   <g class="fade-in d1">
-    <rect x="24" y="90" width="752" height="52" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
-    <text x="38" y="120" font-size="9" font-weight="700" letter-spacing="0.1em" fill="var(--fg-dim)" class="mono">STACK</text>
+    <rect x="20" y="88" width="760" height="50" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+    <text x="36" y="117" font-size="8.5" font-weight="700" letter-spacing="0.1em" fill="var(--fg-dim)">STACK</text>
+    <line x1="84" y1="88" x2="84" y2="138" stroke="var(--border)" stroke-width="1"/>
 """
 
     tile_w = 104
     tile_h = 30
-    start_x = 96
-    gap = 10
+    start_x = 98
+    gap = 9
 
     for idx, lang in enumerate(stack_langs):
         tx = start_x + idx * (tile_w + gap)
@@ -519,129 +508,125 @@ def generate_svg_wide(theme=None, data=None, config=None, avatar_data_uri=""):
         lslug = lang.get("slug", "").lower()
         path_data = ICONS.get(lslug, ICONS["rust"])
 
-        svg += f"""    <g transform="translate({tx}, 101)">
-      <rect width="{tile_w}" height="{tile_h}" rx="3" fill="var(--inner)" stroke="var(--border)" stroke-width="0.75"/>
-      <g transform="translate(10, 6.5) scale(0.7)">
+        svg += f"""    <g transform="translate({tx}, 98)">
+      <rect width="{tile_w}" height="{tile_h}" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
+      <g transform="translate(9, 6.5) scale(0.7)">
         <path fill-rule="evenodd" clip-rule="evenodd" d="{path_data}" fill="var(--fg)"/>
       </g>
-      <text x="33" y="19" font-size="10.5" font-weight="600" fill="var(--fg)">{lname}</text>
+      <text x="32" y="19" font-size="10" font-weight="600" fill="var(--fg)">{lname}</text>
     </g>
 """
 
-    donut_svg = generate_donut_gauge_svg(442, 194, 21, project_scopes)
-
     svg += f"""  </g>
 
-  <!-- BLOCK 3: TARGET PLATFORMS & ARCHITECTURE SCOPE -->
+  <!-- BLOCK 3: TARGET PLATFORMS & DOMAIN TELEMETRY -->
   <g class="fade-in d2">
-    <rect x="24" y="152" width="370" height="84" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
-    <text x="38" y="170" font-size="8.5" font-weight="700" letter-spacing="0.1em" fill="var(--fg-dim)" class="mono">PLATFORMS</text>
+    <rect x="20" y="146" width="376" height="84" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+    <text x="36" y="164" font-size="8" font-weight="700" letter-spacing="0.1em" fill="var(--fg-dim)">PLATFORMS</text>
 """
 
     for idx, p in enumerate(platforms):
-        px = 38 + idx * 116
+        px = 36 + idx * 118
         p_name = xesc(p.get("name", ""))
         p_sub = xesc(p.get("sub", p.get("badge", "")).split("·")[0].strip())
         p_slug = p.get("slug", p_name.lower())
         p_icon = ICONS.get(p_slug, ICONS["linux"])
 
-        svg += f"""    <g transform="translate({px}, 178)">
-      <rect width="108" height="44" rx="3" fill="var(--inner)" stroke="var(--border)" stroke-width="0.75"/>
-      <g transform="translate(10, 10) scale(0.75)">
+        svg += f"""    <g transform="translate({px}, 172)">
+      <rect width="108" height="46" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
+      <g transform="translate(10, 13) scale(0.82)">
         <path d="{p_icon}" fill="var(--fg)"/>
       </g>
-      <text x="34" y="20" font-size="10.5" font-weight="700" fill="var(--fg)">{p_name}</text>
-      <text x="34" y="33" font-size="8.5" font-weight="500" fill="var(--fg-dim)">{p_sub}</text>
+      <text x="36" y="21" font-size="10.5" font-weight="700" fill="var(--fg)" class="sans">{p_name}</text>
+      <text x="36" y="34" font-size="8" font-weight="500" fill="var(--fg-dim)">{p_sub}</text>
     </g>
 """
 
     svg += f"""
-    <rect x="406" y="152" width="370" height="84" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
-    <text x="482" y="170" font-size="8.5" font-weight="700" letter-spacing="0.1em" fill="var(--fg-dim)" class="mono">DOMAIN</text>
-{donut_svg}
+    <rect x="404" y="146" width="376" height="84" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+    <text x="420" y="164" font-size="8" font-weight="700" letter-spacing="0.1em" fill="var(--fg-dim)">ARCHITECTURE</text>
+{scope_bar_svg}
 """
 
     c_vars = ["var(--c1)", "var(--c2)", "var(--c3)"]
     for idx, s in enumerate(project_scopes):
-        ly = 186 + idx * 16
-        s_name = xesc(truncate(s.get("name", ""), 22))
+        lx = 420 + idx * 116
+        s_name = xesc(truncate(s.get("name", "").split("&")[0].strip(), 12))
         s_pct = s.get("pct", 0)
         c_var = c_vars[idx % len(c_vars)]
-        bar_w = max(4, int((s_pct / 100.0) * 64))
 
-        svg += f"""    <g>
-      <rect x="482" y="{ly - 7}" width="8" height="8" rx="1.5" fill="{c_var}"/>
-      <text x="496" y="{ly}" font-size="9.5" font-weight="500" fill="var(--fg)">{s_name}</text>
-      <rect x="652" y="{ly - 5}" width="64" height="4" rx="2" fill="var(--inner)"/>
-      <rect x="652" y="{ly - 5}" width="{bar_w}" height="4" rx="2" fill="{c_var}"/>
-      <text x="760" y="{ly}" text-anchor="end" font-size="9.5" font-weight="700" fill="var(--fg)" class="mono">{s_pct}%</text>
+        svg += f"""    <g transform="translate({lx}, 196)">
+      <rect x="0" y="4" width="6" height="14" fill="{c_var}"/>
+      <text x="12" y="11" font-size="8" font-weight="600" fill="var(--fg-muted)">{s_name}</text>
+      <text x="12" y="22" font-size="10" font-weight="700" fill="var(--fg)">{s_pct}%</text>
     </g>
 """
 
     svg += f"""  </g>
 
-  <!-- BLOCK 4: ACTIVITY RHYTHM -->
+  <!-- BLOCK 4: HARD-ANGLED OSCILLOSCOPE RHYTHM -->
   <g class="fade-in d3">
-    <rect x="24" y="246" width="752" height="120" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
-    <text x="38" y="266" font-size="8.5" font-weight="700" letter-spacing="0.1em" fill="var(--fg-dim)" class="mono">ACTIVITY RHYTHM</text>
-    <text x="760" y="266" text-anchor="end" font-size="9" font-weight="600" fill="var(--fg-muted)" class="mono">{total_contribs} COMMITS · PEAK {max_week}/WK</text>
+    <rect x="20" y="238" width="760" height="124" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+    <text x="36" y="257" font-size="8" font-weight="700" letter-spacing="0.1em" fill="var(--fg-dim)">ACTIVITY RHYTHM</text>
+    <text x="762" y="257" text-anchor="end" font-size="8.5" font-weight="700" fill="var(--fg-muted)">{total_contribs} COMMITS // MAX {max_week}</text>
 
     <line x1="{wave_x}" y1="{wave_y_base}" x2="{wave_x + wave_w}" y2="{wave_y_base}" stroke="var(--border)" stroke-width="1"/>
-    <line x1="{wave_x}" y1="{wave_y_top + wave_h * 0.5:.1f}" x2="{wave_x + wave_w}" y2="{wave_y_top + wave_h * 0.5:.1f}" stroke="var(--border-sub)" stroke-dasharray="3,4" stroke-width="0.75"/>
+    <line x1="{wave_x}" y1="{wave_y_top + wave_h * 0.5:.1f}" x2="{wave_x + wave_w}" y2="{wave_y_top + wave_h * 0.5:.1f}" stroke="var(--border-sub)" stroke-dasharray="2,3" stroke-width="1"/>
 
-    <!-- Impulse Telemetry Bars -->
+    <!-- Rectangular Telemetry Bars -->
 {chr(10).join(bars_svg)}
 
-    <!-- Smooth Area & Trajectory -->
+    <!-- Angular Vector Fill & Mitered Trajectory -->
     <path d="{area_d}" fill="url(#waveGradW)"/>
-    <path class="draw-stroke" d="{stroke_d}" fill="none" stroke="var(--accent)" stroke-width="1.75" stroke-linecap="round"/>
+    <path class="draw-stroke" d="{stroke_d}" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="miter" stroke-miterlimit="3"/>
 
-    <!-- Peak Node -->
-    <line x1="{peak_x:.1f}" y1="{peak_y:.1f}" x2="{peak_x:.1f}" y2="{wave_y_base}" stroke="var(--accent)" stroke-dasharray="2,2" stroke-width="0.75" opacity="0.5"/>
-    <circle cx="{peak_x:.1f}" cy="{peak_y:.1f}" r="3" fill="var(--accent)"/>
-    <circle cx="{peak_x:.1f}" cy="{peak_y:.1f}" r="3.5" fill="none" stroke="var(--accent)" stroke-width="1" class="pulse"/>
-    <rect x="{peak_label_x - 20:.1f}" y="{peak_y - 19:.1f}" width="40" height="13" rx="2" fill="var(--inner)" stroke="var(--border)" stroke-width="0.75"/>
-    <text x="{peak_label_x:.1f}" y="{peak_y - 10:.1f}" text-anchor="middle" font-size="8.5" font-weight="700" fill="var(--fg)" class="mono">{max_week}</text>
+    <!-- Sharp Square Peak Reticle -->
+    <line x1="{peak_x:.1f}" y1="{peak_y:.1f}" x2="{peak_x:.1f}" y2="{wave_y_base}" stroke="var(--accent)" stroke-dasharray="2,2" stroke-width="0.75" opacity="0.55"/>
+    <rect x="{peak_x - 3:.1f}" y="{peak_y - 3:.1f}" width="6" height="6" fill="var(--accent)"/>
+    <rect x="{peak_x - 3:.1f}" y="{peak_y - 3:.1f}" width="6" height="6" fill="none" stroke="var(--accent)" stroke-width="1" class="pulse"/>
+    <rect x="{peak_label_x - 18:.1f}" y="{peak_y - 19:.1f}" width="36" height="13" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
+    <text x="{peak_label_x:.1f}" y="{peak_y - 9.5:.1f}" text-anchor="middle" font-size="8.5" font-weight="700" fill="var(--fg)">{max_week}</text>
 
-    <!-- Current Week Node -->
-    <circle cx="{curr_x:.1f}" cy="{curr_y:.1f}" r="2.5" fill="var(--status)"/>
+    <!-- Current Week Square Node -->
+    <rect x="{curr_x - 2.5:.1f}" y="{curr_y - 2.5:.1f}" width="5" height="5" fill="var(--status)"/>
 
-    <!-- Minimal Quarter Ticks -->
-    <g font-size="8" font-weight="500" fill="var(--fg-dim)" class="mono">
-      <text x="{wave_x}" y="358">W01</text>
-      <text x="{wave_x + wave_w * 0.5:.1f}" y="358" text-anchor="middle">W26</text>
-      <text x="{wave_x + wave_w}" y="358" text-anchor="end">W52</text>
+    <g font-size="7.5" font-weight="600" fill="var(--fg-dim)">
+      <text x="{wave_x}" y="355">W01</text>
+      <text x="{wave_x + wave_w * 0.25:.1f}" y="355" text-anchor="middle">W13</text>
+      <text x="{wave_x + wave_w * 0.5:.1f}" y="355" text-anchor="middle">W26</text>
+      <text x="{wave_x + wave_w * 0.75:.1f}" y="355" text-anchor="middle">W39</text>
+      <text x="{wave_x + wave_w}" y="355" text-anchor="end">W52</text>
     </g>
   </g>
 
-  <!-- BLOCK 5: 2x2 VISUAL REPO BENTO -->
+  <!-- BLOCK 5: 2x2 ZED SPLIT-PANE REPO GRID -->
   <g class="fade-in d4">
 """
 
-    card_coords = [(24, 376), (406, 376), (24, 434), (406, 434)]
+    card_coords = [(20, 370), (404, 370), (20, 426), (404, 426)]
     for idx, repo in enumerate(featured[:4]):
         cx, cy = card_coords[idx]
         r_name = xesc(truncate(repo.get("name", ""), 26))
         r_stack = xesc(repo.get("stack", "Code"))
         r_stars = repo.get("stars", 0)
-        star_badge = f"★ {r_stars}" if r_stars > 0 else "●"
+        star_badge = f"★ {r_stars}" if r_stars > 0 else f"0{idx + 1}"
 
         svg += f"""    <g transform="translate({cx}, {cy})">
-      <rect width="370" height="48" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
-      <rect x="14" y="19" width="6" height="10" rx="1.5" fill="var(--c1)"/>
-      <text x="28" y="28" font-size="12" font-weight="700" fill="var(--fg)">{r_name}</text>
-      <rect x="240" y="14" width="76" height="20" rx="3" fill="var(--inner)" stroke="var(--border-sub)" stroke-width="0.75"/>
-      <text x="278" y="27" text-anchor="middle" font-size="8.5" font-weight="600" fill="var(--fg-muted)" class="mono">{r_stack}</text>
-      <text x="354" y="28" text-anchor="end" font-size="10" font-weight="700" fill="var(--fg)" class="mono">{star_badge}</text>
+      <rect width="376" height="48" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+      <rect x="0" y="0" width="3" height="48" fill="var(--c1)"/>
+      <text x="16" y="28" font-size="12" font-weight="700" fill="var(--fg)" class="sans">{r_name}</text>
+      <rect x="238" y="14" width="84" height="20" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
+      <text x="280" y="27" text-anchor="middle" font-size="8.5" font-weight="600" fill="var(--fg-muted)">{r_stack}</text>
+      <text x="360" y="28" text-anchor="end" font-size="9.5" font-weight="700" fill="var(--fg-dim)">{star_badge}</text>
     </g>
 """
 
     svg += f"""  </g>
 
-  <!-- MINIMAL FOOTER -->
-  <g class="fade-in d4 mono" font-size="8.5" font-weight="500" fill="var(--fg-dim)">
-    <text x="26" y="504">{location}</text>
-    <text x="774" y="504" text-anchor="end">LIVE TELEMETRY</text>
+  <!-- ZED STATUSLINE FOOTER -->
+  <g class="fade-in d4" font-size="8.5" font-weight="600" fill="var(--fg-dim)">
+    <text x="22" y="496">{location}</text>
+    <text x="778" y="496" text-anchor="end">UTF-8 // LF // TELEMETRY</text>
   </g>
 </svg>
 """
@@ -675,15 +660,15 @@ def generate_svg_portrait(theme=None, data=None, config=None, avatar_data_uri=""
         points.append((px, py))
 
         bar_h = max(1.5, norm * wave_h)
-        bar_op = 0.12 + (norm * 0.28)
+        bar_op = 0.10 + (norm * 0.22)
         bars_svg.append(
-            f'    <line x1="{px:.1f}" y1="{wave_y_base}" x2="{px:.1f}" y2="{wave_y_base - bar_h:.1f}" '
-            f'stroke="var(--fg-muted)" stroke-width="1.5" stroke-opacity="{bar_op:.2f}"/>'
+            f'    <rect x="{px - 1.5:.1f}" y="{wave_y_base - bar_h:.1f}" width="3" height="{bar_h:.1f}" '
+            f'fill="var(--fg-muted)" fill-opacity="{bar_op:.2f}"/>'
         )
 
-    stroke_d, area_d = build_smooth_oscilloscope(points, wave_y_base, wave_y_top)
+    stroke_d, area_d = build_angular_oscilloscope(points, wave_y_base)
     peak_x, peak_y = points[peak_idx]
-    peak_label_x = max(wave_x + 22, min(wave_x + wave_w - 22, peak_x))
+    peak_label_x = max(wave_x + 20, min(wave_x + wave_w - 20, peak_x))
 
     stack_langs = config.get(
         "stack_languages",
@@ -723,62 +708,62 @@ def generate_svg_portrait(theme=None, data=None, config=None, avatar_data_uri=""
     location = xesc(config.get("location") or data.get("location") or "Goiás, Brazil")
 
     if avatar_data_uri:
-        avatar_svg = f"""      <clipPath id="avatarClipP"><rect x="28" y="24" width="40" height="40" rx="4"/></clipPath>
-      <image href="{avatar_data_uri}" x="28" y="24" width="40" height="40" clip-path="url(#avatarClipP)" preserveAspectRatio="xMidYMid slice"/>
-      <rect x="28" y="24" width="40" height="40" rx="4" fill="none" stroke="var(--border)" stroke-width="1"/>"""
+        avatar_svg = f"""      <image href="{avatar_data_uri}" x="26" y="24" width="40" height="40" preserveAspectRatio="xMidYMid slice"/>
+      <rect x="26" y="24" width="40" height="40" fill="none" stroke="var(--border)" stroke-width="1"/>"""
     else:
-        avatar_svg = """      <rect x="28" y="24" width="40" height="40" rx="4" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
-      <text x="48" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="var(--fg)">NP</text>"""
+        avatar_svg = """      <rect x="26" y="24" width="40" height="40" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
+      <text x="46" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="var(--fg)">NP</text>"""
 
-    donut_svg = generate_donut_gauge_svg(214, 248, 17, project_scopes)
+    scope_bar_svg = generate_segmented_bar_svg(192, 204, 180, 10, project_scopes)
 
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 580" width="100%" height="100%">
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 572" width="100%" height="100%">
   <defs>
     <style>{get_theme_css(theme)}</style>
     <linearGradient id="waveGradP" gradientUnits="userSpaceOnUse" x1="0" y1="{wave_y_top}" x2="0" y2="{wave_y_base}">
       <stop offset="0%" stop-color="var(--accent)" stop-opacity="var(--accent-op1)"/>
-      <stop offset="65%" stop-color="var(--accent)" stop-opacity="var(--accent-op2)"/>
+      <stop offset="70%" stop-color="var(--accent)" stop-opacity="var(--accent-op2)"/>
       <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.0"/>
     </linearGradient>
-    <pattern id="dotGridP" width="16" height="16" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="0.7" fill="var(--border)" opacity="0.5"/>
+    <pattern id="zedGridP" width="16" height="16" patternUnits="userSpaceOnUse">
+      <path d="M 16 0 L 0 0 0 16" fill="none" stroke="var(--border-sub)" stroke-width="0.6" opacity="0.6"/>
     </pattern>
   </defs>
 
-  <rect width="400" height="580" rx="6" fill="var(--bg)"/>
-  <rect width="400" height="580" rx="6" fill="url(#dotGridP)"/>
-  <rect x="0.5" y="0.5" width="399" height="579" rx="5.5" fill="none" stroke="var(--border)" stroke-width="1"/>
+  <rect width="400" height="572" fill="var(--bg)"/>
+  <rect width="400" height="572" fill="url(#zedGridP)"/>
+  <rect x="0.5" y="0.5" width="399" height="571" fill="none" stroke="var(--border)" stroke-width="1"/>
 
   <!-- HEADER -->
   <g class="fade-in">
-    <rect x="16" y="14" width="368" height="60" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+    <rect x="16" y="14" width="368" height="60" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+    <line x1="16" y1="14" x2="120" y2="14" stroke="var(--accent)" stroke-width="2"/>
 {avatar_svg}
-    <text x="80" y="41" font-size="14" font-weight="700" fill="var(--fg)">{display_name}</text>
-    <text x="80" y="57" font-size="10" font-weight="400" fill="var(--fg-muted)">{tagline}</text>
-    <circle cx="368" cy="30" r="3.5" fill="var(--status)"/>
-    <circle cx="368" cy="30" r="3.5" fill="none" stroke="var(--status)" stroke-width="1" class="pulse"/>
+    <text x="78" y="41" font-size="14" font-weight="700" fill="var(--fg)" class="sans">{display_name}</text>
+    <text x="78" y="57" font-size="9.5" font-weight="400" fill="var(--fg-muted)">{tagline}</text>
+    <rect x="364" y="26" width="6" height="6" fill="var(--status)"/>
+    <rect x="364" y="26" width="6" height="6" fill="none" stroke="var(--status)" stroke-width="1" class="pulse"/>
   </g>
 
   <!-- STACK (2x3) -->
   <g class="fade-in d1">
-    <rect x="16" y="84" width="368" height="82" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+    <rect x="16" y="82" width="368" height="82" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
 """
 
     for idx, lang in enumerate(stack_langs):
         col = idx % 3
         row = idx // 3
         tx = 26 + col * 118
-        ty = 94 + row * 34
+        ty = 92 + row * 34
         lname = xesc(lang.get("name", ""))
         lslug = lang.get("slug", "").lower()
         path_data = ICONS.get(lslug, ICONS["rust"])
 
         svg += f"""    <g transform="translate({tx}, {ty})">
-      <rect width="112" height="28" rx="3" fill="var(--inner)" stroke="var(--border)" stroke-width="0.75"/>
+      <rect width="112" height="28" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
       <g transform="translate(8, 5.5) scale(0.68)">
         <path fill-rule="evenodd" clip-rule="evenodd" d="{path_data}" fill="var(--fg)"/>
       </g>
-      <text x="30" y="18" font-size="10" font-weight="600" fill="var(--fg)">{lname}</text>
+      <text x="30" y="18" font-size="9.5" font-weight="600" fill="var(--fg)">{lname}</text>
     </g>
 """
 
@@ -786,41 +771,41 @@ def generate_svg_portrait(theme=None, data=None, config=None, avatar_data_uri=""
 
   <!-- PLATFORMS & SCOPE -->
   <g class="fade-in d2">
-    <rect x="16" y="176" width="368" height="102" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+    <rect x="16" y="172" width="368" height="104" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
 """
 
     for idx, p in enumerate(platforms):
-        py = 188 + idx * 28
+        py = 184 + idx * 28
         p_name = xesc(p.get("name", ""))
         p_slug = p.get("slug", p_name.lower())
         p_icon = ICONS.get(p_slug, ICONS["linux"])
 
         svg += f"""    <g transform="translate(26, {py})">
-      <rect width="142" height="24" rx="3" fill="var(--inner)" stroke="var(--border)" stroke-width="0.75"/>
-      <g transform="translate(8, 4) scale(0.65)">
+      <rect width="142" height="24" fill="var(--inner)" stroke="var(--border)" stroke-width="1"/>
+      <g transform="translate(8, 4) scale(0.68)">
         <path d="{p_icon}" fill="var(--fg)"/>
       </g>
-      <text x="30" y="15.5" font-size="9.5" font-weight="700" fill="var(--fg)">{p_name}</text>
+      <text x="32" y="16" font-size="9.5" font-weight="700" fill="var(--fg)" class="sans">{p_name}</text>
     </g>
 """
 
-    svg += f"""    <line x1="180" y1="188" x2="180" y2="268" stroke="var(--border-sub)" stroke-width="1"/>
-    <text x="194" y="200" font-size="8" font-weight="700" letter-spacing="0.08em" fill="var(--fg-dim)" class="mono">SCOPE</text>
-{donut_svg}
+    svg += f"""    <line x1="178" y1="184" x2="178" y2="266" stroke="var(--border)" stroke-width="1"/>
+    <text x="192" y="196" font-size="8" font-weight="700" letter-spacing="0.08em" fill="var(--fg-dim)">ARCHITECTURE</text>
+{scope_bar_svg}
 """
 
     c_vars = ["var(--c1)", "var(--c2)", "var(--c3)"]
     short_labels = ["Drivers", "UI / GFX", "Systems"]
     for idx, s in enumerate(project_scopes):
-        ly = 232 + idx * 15
+        ly = 230 + idx * 14
         s_name = short_labels[idx] if idx < len(short_labels) else xesc(s.get("name", "")[:10])
         s_pct = s.get("pct", 0)
         c_var = c_vars[idx % len(c_vars)]
 
         svg += f"""    <g>
-      <rect x="242" y="{ly - 6}" width="6" height="6" rx="1" fill="{c_var}"/>
-      <text x="253" y="{ly}" font-size="8.5" font-weight="600" fill="var(--fg)">{s_name}</text>
-      <text x="372" y="{ly}" text-anchor="end" font-size="8.5" font-weight="700" fill="var(--fg)" class="mono">{s_pct}%</text>
+      <rect x="192" y="{ly - 6}" width="6" height="6" fill="{c_var}"/>
+      <text x="204" y="{ly}" font-size="8.5" font-weight="600" fill="var(--fg-muted)">{s_name}</text>
+      <text x="372" y="{ly}" text-anchor="end" font-size="8.5" font-weight="700" fill="var(--fg)">{s_pct}%</text>
     </g>
 """
 
@@ -828,23 +813,23 @@ def generate_svg_portrait(theme=None, data=None, config=None, avatar_data_uri=""
 
   <!-- ACTIVITY RHYTHM -->
   <g class="fade-in d3">
-    <rect x="16" y="288" width="368" height="114" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
-    <text x="28" y="306" font-size="8" font-weight="700" letter-spacing="0.08em" fill="var(--fg-dim)" class="mono">RHYTHM</text>
-    <text x="372" y="306" text-anchor="end" font-size="8.5" font-weight="600" fill="var(--fg-muted)" class="mono">{total_contribs} COMMITS · PEAK {max_week}</text>
+    <rect x="16" y="284" width="368" height="116" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+    <text x="28" y="302" font-size="8" font-weight="700" letter-spacing="0.08em" fill="var(--fg-dim)">RHYTHM</text>
+    <text x="372" y="302" text-anchor="end" font-size="8" font-weight="700" fill="var(--fg-muted)">{total_contribs} // MAX {max_week}</text>
 
     <line x1="{wave_x}" y1="{wave_y_base}" x2="{wave_x + wave_w}" y2="{wave_y_base}" stroke="var(--border)" stroke-width="1"/>
 {chr(10).join(bars_svg)}
     <path d="{area_d}" fill="url(#waveGradP)"/>
-    <path class="draw-stroke" d="{stroke_d}" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+    <path class="draw-stroke" d="{stroke_d}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="miter" stroke-miterlimit="3"/>
 
-    <circle cx="{peak_x:.1f}" cy="{peak_y:.1f}" r="2.8" fill="var(--accent)"/>
-    <circle cx="{peak_x:.1f}" cy="{peak_y:.1f}" r="3.2" fill="none" stroke="var(--accent)" stroke-width="1" class="pulse"/>
-    <text x="{peak_label_x:.1f}" y="{peak_y - 7:.1f}" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)" class="mono">{max_week}</text>
+    <rect x="{peak_x - 2.5:.1f}" y="{peak_y - 2.5:.1f}" width="5" height="5" fill="var(--accent)"/>
+    <rect x="{peak_x - 2.5:.1f}" y="{peak_y - 2.5:.1f}" width="5" height="5" fill="none" stroke="var(--accent)" stroke-width="1" class="pulse"/>
+    <text x="{peak_label_x:.1f}" y="{peak_y - 7:.1f}" text-anchor="middle" font-size="8" font-weight="700" fill="var(--fg)">{max_week}</text>
 
-    <g font-size="7.5" font-weight="500" fill="var(--fg-dim)" class="mono">
-      <text x="{wave_x}" y="395">W01</text>
-      <text x="{wave_x + wave_w * 0.5:.1f}" y="395" text-anchor="middle">W26</text>
-      <text x="{wave_x + wave_w}" y="395" text-anchor="end">W52</text>
+    <g font-size="7.5" font-weight="600" fill="var(--fg-dim)">
+      <text x="{wave_x}" y="394">W01</text>
+      <text x="{wave_x + wave_w * 0.5:.1f}" y="394" text-anchor="middle">W26</text>
+      <text x="{wave_x + wave_w}" y="394" text-anchor="end">W52</text>
     </g>
   </g>
 
@@ -852,30 +837,30 @@ def generate_svg_portrait(theme=None, data=None, config=None, avatar_data_uri=""
   <g class="fade-in d4">
 """
 
-    p_coords = [(16, 412), (204, 412), (16, 478), (204, 478)]
+    p_coords = [(16, 408), (204, 408), (16, 474), (204, 474)]
     for idx, repo in enumerate(featured[:4]):
         cx, cy = p_coords[idx]
         r_name = xesc(truncate(repo.get("name", ""), 16))
         r_stack = xesc(repo.get("stack", "Code"))
         r_stars = repo.get("stars", 0)
-        star_str = f"★ {r_stars}" if r_stars > 0 else "●"
+        star_str = f"★ {r_stars}" if r_stars > 0 else f"0{idx + 1}"
 
         svg += f"""    <g transform="translate({cx}, {cy})">
-      <rect width="180" height="58" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
-      <rect x="12" y="14" width="5" height="9" rx="1" fill="var(--c1)"/>
-      <text x="23" y="22" font-size="11" font-weight="700" fill="var(--fg)">{r_name}</text>
-      <text x="168" y="22" text-anchor="end" font-size="9" font-weight="700" fill="var(--fg)" class="mono">{star_str}</text>
-      <rect x="12" y="32" width="70" height="16" rx="2.5" fill="var(--inner)"/>
-      <text x="47" y="43" text-anchor="middle" font-size="8" font-weight="600" fill="var(--fg-muted)" class="mono">{r_stack}</text>
+      <rect width="180" height="58" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+      <rect x="0" y="0" width="3" height="58" fill="var(--c1)"/>
+      <text x="12" y="22" font-size="11" font-weight="700" fill="var(--fg)" class="sans">{r_name}</text>
+      <text x="168" y="22" text-anchor="end" font-size="8.5" font-weight="700" fill="var(--fg-dim)">{star_str}</text>
+      <rect x="12" y="32" width="76" height="16" fill="var(--inner)" stroke="var(--border)" stroke-width="0.75"/>
+      <text x="50" y="43" text-anchor="middle" font-size="7.5" font-weight="600" fill="var(--fg-muted)">{r_stack}</text>
     </g>
 """
 
     svg += f"""  </g>
 
   <!-- FOOTER -->
-  <g class="fade-in d4 mono" font-size="8" font-weight="500" fill="var(--fg-dim)">
-    <text x="18" y="560">{location}</text>
-    <text x="382" y="560" text-anchor="end">LIVE TELEMETRY</text>
+  <g class="fade-in d4" font-size="8" font-weight="600" fill="var(--fg-dim)">
+    <text x="18" y="554">{location}</text>
+    <text x="382" y="554" text-anchor="end">UTF-8 // TELEMETRY</text>
   </g>
 </svg>
 """
@@ -924,7 +909,7 @@ def main():
     (ASSETS_DIR / "zed-card-dark.svg").write_text(wide_dark, encoding="utf-8")
     (ASSETS_DIR / "zed-card-light.svg").write_text(wide_light, encoding="utf-8")
 
-    print("All adaptive, wide, and portrait SVG assets generated and XML-validated!")
+    print("All Zed-styled SVG assets generated successfully!")
 
 
 if __name__ == "__main__":
