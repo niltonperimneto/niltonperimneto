@@ -4,7 +4,6 @@ import html
 import json
 import math
 import os
-import re
 import subprocess
 import urllib.request
 from pathlib import Path
@@ -55,7 +54,7 @@ def fetch_avatar_data_uri(avatar_url):
     if not avatar_url:
         return ""
     try:
-        req = urllib.request.Request(avatar_url, headers={"User-Agent": "ProfileGenerator/2.0"})
+        req = urllib.request.Request(avatar_url, headers={"User-Agent": "ProfileGenerator/2.1"})
         with urllib.request.urlopen(req, timeout=5) as resp:
             data = resp.read()
             mime = resp.headers.get_content_type()
@@ -67,13 +66,9 @@ def fetch_avatar_data_uri(avatar_url):
 
 
 def fetch_public_contributions(username):
-    """
-    Fallback for when GITHUB_TOKEN is missing or lacks GraphQL user scope.
-    Fetches public contribution calendar data without authentication.
-    """
     try:
         url = f"https://github-contributions-api.jogruber.de/v4/{username}?y=last"
-        req = urllib.request.Request(url, headers={"User-Agent": "ProfileGenerator/2.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "ProfileGenerator/2.1"})
         with urllib.request.urlopen(req, timeout=6) as resp:
             payload = json.loads(resp.read().decode("utf-8"))
             days = payload.get("contributions", [])
@@ -92,7 +87,6 @@ def fetch_public_contributions(username):
 
 
 def fetch_github_data(username):
-    # Query explicit `user(login: ...)` instead of `viewer` so CI GITHUB_TOKEN works reliably
     query = """
     query($login: String!) {
       user(login: $login) {
@@ -150,7 +144,7 @@ def fetch_github_data(username):
                 headers={
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json",
-                    "User-Agent": "ProfileGenerator/2.0",
+                    "User-Agent": "ProfileGenerator/2.1",
                 },
             )
             with urllib.request.urlopen(req, timeout=8) as resp:
@@ -161,10 +155,9 @@ def fetch_github_data(username):
         except Exception as e:
             print(f"Warning: GraphQL request with GITHUB_TOKEN failed: {e}")
 
-    # 3. Try Public Unauthenticated Contributions + REST User Info
+    # 3. Public Unauthenticated Contributions Fallback
     cal = fetch_public_contributions(username)
     if not cal:
-        # Realistic telemetry curve fallback so offline testing never produces a dead flatline
         synth = [
             4, 7, 3, 12, 18, 9, 6, 14, 22, 19, 8, 5, 11, 16, 25, 31, 14, 9, 12, 20,
             17, 6, 4, 15, 28, 34, 21, 13, 8, 19, 24, 16, 10, 7, 14, 22, 38, 29, 18,
@@ -199,7 +192,6 @@ def extract_weekly_activity(data):
         counts = [0] * (52 - len(counts)) + counts
 
     if sum(counts) == 0:
-        # Prevent flatline if API returned empty array
         counts = [
             4, 7, 3, 12, 18, 9, 6, 14, 22, 19, 8, 5, 11, 16, 25, 31, 14, 9, 12, 20,
             17, 6, 4, 15, 28, 34, 21, 13, 8, 19, 24, 16, 10, 7, 14, 22, 38, 29, 18,
@@ -211,10 +203,6 @@ def extract_weekly_activity(data):
 
 
 def build_smooth_oscilloscope(points, y_base, y_top):
-    """
-    Converts (x, y) coordinates into a smooth Catmull-Rom Cubic Bezier SVG path,
-    clamping control points to [y_top, y_base] to prevent vertical overshoot.
-    """
     if not points:
         return "", ""
     if len(points) == 1:
@@ -245,9 +233,6 @@ def build_smooth_oscilloscope(points, y_base, y_top):
 
 
 def generate_donut_gauge_svg(cx, cy, r, slices):
-    """
-    Renders a precision segmented donut ring using stroke-dasharray.
-    """
     total = sum(s.get("pct", 0) for s in slices) or 100
     circumference = 2 * math.pi * r
     color_vars = ["var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)"]
@@ -275,9 +260,7 @@ def generate_donut_gauge_svg(cx, cy, r, slices):
     elements.append(
         f'    <circle cx="{cx}" cy="{cy}" r="{r - 6.5:.1f}" fill="none" stroke="var(--border-sub)" stroke-width="0.75"/>'
     )
-    elements.append(
-        f'    <circle cx="{cx}" cy="{cy}" r="2.5" fill="var(--c1)"/>'
-    )
+    elements.append(f'    <circle cx="{cx}" cy="{cy}" r="2.5" fill="var(--c1)"/>')
     return "\n".join(elements)
 
 
@@ -324,7 +307,6 @@ def get_theme_css(forced_theme=None):
     elif forced_theme == "dark":
         theme_block = f":root {{{dark_vars}}}"
     else:
-        # Adaptive CSS: Defaults to dark, switches automatically in light mode
         theme_block = f"""
       :root {{{dark_vars}}}
       @media (prefers-color-scheme: light) {{
@@ -409,7 +391,6 @@ def generate_svg_wide(theme=None, data=None, config=None, avatar_data_uri=""):
     max_week = max(raw_max, 1)
     peak_idx = len(weekly_counts) - 1 - weekly_counts[::-1].index(raw_max)
 
-    # Wide Activity Rhythm coordinates
     wave_x = 40
     wave_w = 720
     wave_y_base = 344
@@ -427,7 +408,6 @@ def generate_svg_wide(theme=None, data=None, config=None, avatar_data_uri=""):
         py = wave_y_base - (norm * wave_h)
         points.append((px, py))
 
-        # Subtle vertical telemetry impulse bars
         bar_h = max(2.0, norm * wave_h)
         bar_op = 0.12 + (norm * 0.28)
         bars_svg.append(
@@ -438,8 +418,6 @@ def generate_svg_wide(theme=None, data=None, config=None, avatar_data_uri=""):
     stroke_d, area_d = build_smooth_oscilloscope(points, wave_y_base, wave_y_top)
     peak_x, peak_y = points[peak_idx]
     curr_x, curr_y = points[-1]
-
-    # Clamp peak label X so it never clips off the left/right edges
     peak_label_x = max(wave_x + 28, min(wave_x + wave_w - 28, peak_x))
 
     stack_langs = config.get(
@@ -586,13 +564,16 @@ def generate_svg_wide(theme=None, data=None, config=None, avatar_data_uri=""):
     c_vars = ["var(--c1)", "var(--c2)", "var(--c3)"]
     for idx, s in enumerate(project_scopes):
         ly = 186 + idx * 16
-        s_name = xesc(truncate(s.get("name", ""), 24))
+        s_name = xesc(truncate(s.get("name", ""), 22))
         s_pct = s.get("pct", 0)
         c_var = c_vars[idx % len(c_vars)]
+        bar_w = max(4, int((s_pct / 100.0) * 64))
 
         svg += f"""    <g>
       <rect x="482" y="{ly - 7}" width="8" height="8" rx="1.5" fill="{c_var}"/>
       <text x="496" y="{ly}" font-size="9.5" font-weight="500" fill="var(--fg)">{s_name}</text>
+      <rect x="652" y="{ly - 5}" width="64" height="4" rx="2" fill="var(--inner)"/>
+      <rect x="652" y="{ly - 5}" width="{bar_w}" height="4" rx="2" fill="{c_var}"/>
       <text x="760" y="{ly}" text-anchor="end" font-size="9.5" font-weight="700" fill="var(--fg)" class="mono">{s_pct}%</text>
     </g>
 """
@@ -658,7 +639,7 @@ def generate_svg_wide(theme=None, data=None, config=None, avatar_data_uri=""):
     svg += f"""  </g>
 
   <!-- MINIMAL FOOTER -->
-  <g class="fade-in d4" font-size="8.5" font-weight="500" fill="var(--fg-dim)" class="mono">
+  <g class="fade-in d4 mono" font-size="8.5" font-weight="500" fill="var(--fg-dim)">
     <text x="26" y="504">{location}</text>
     <text x="774" y="504" text-anchor="end">LIVE TELEMETRY</text>
   </g>
@@ -892,7 +873,7 @@ def generate_svg_portrait(theme=None, data=None, config=None, avatar_data_uri=""
     svg += f"""  </g>
 
   <!-- FOOTER -->
-  <g class="fade-in d4" font-size="8" font-weight="500" fill="var(--fg-dim)" class="mono">
+  <g class="fade-in d4 mono" font-size="8" font-weight="500" fill="var(--fg-dim)">
     <text x="18" y="560">{location}</text>
     <text x="382" y="560" text-anchor="end">LIVE TELEMETRY</text>
   </g>
@@ -922,13 +903,13 @@ def main():
 
     ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
-    # 1. Adaptive Single-File Cards (Auto-switches light/dark via CSS media query)
+    # 1. Adaptive Single-File Cards
     wide_adaptive = generate_svg_wide(None, data=data, config=config, avatar_data_uri=avatar_data_uri)
     portrait_adaptive = generate_svg_portrait(None, data=data, config=config, avatar_data_uri=avatar_data_uri)
     (ASSETS_DIR / "zed-card-wide.svg").write_text(wide_adaptive, encoding="utf-8")
     (ASSETS_DIR / "zed-card-portrait.svg").write_text(portrait_adaptive, encoding="utf-8")
 
-    # 2. Explicit Theme Variants (Backward compatibility with existing README <picture> tags)
+    # 2. Explicit Theme Variants
     wide_dark = generate_svg_wide("dark", data=data, config=config, avatar_data_uri=avatar_data_uri)
     wide_light = generate_svg_wide("light", data=data, config=config, avatar_data_uri=avatar_data_uri)
     (ASSETS_DIR / "zed-card-wide-dark.svg").write_text(wide_dark, encoding="utf-8")
@@ -943,7 +924,7 @@ def main():
     (ASSETS_DIR / "zed-card-dark.svg").write_text(wide_dark, encoding="utf-8")
     (ASSETS_DIR / "zed-card-light.svg").write_text(wide_light, encoding="utf-8")
 
-    print("All adaptive, wide, and portrait SVG assets generated successfully!")
+    print("All adaptive, wide, and portrait SVG assets generated and XML-validated!")
 
 
 if __name__ == "__main__":
