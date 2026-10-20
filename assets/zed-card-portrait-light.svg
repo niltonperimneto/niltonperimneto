@@ -53,7 +53,7 @@
 <text x="142.66666666666669" y="395" class="muted">UI 35%</text>
 <text x="257.33333333333337" y="395" class="muted">Systems 20%</text>
 <text x="28" y="434" class="label">Activity</text>
-<text x="372" y="434" class="muted" text-anchor="end">1,175 contributions / 52 weeks</text>
+<text x="372" y="434" class="muted" text-anchor="end">1,317 contributions / 52 weeks</text>
 <rect x="28.00" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="34.62" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="41.23" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
@@ -61,51 +61,51 @@
 <rect x="54.46" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="61.08" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="67.69" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
-<rect x="74.31" y="456.00" width="3.62" height="54.00" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="80.92" y="496.42" width="3.62" height="13.58" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="87.54" y="500.72" width="3.62" height="9.28" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="74.31" y="458.53" width="3.62" height="51.47" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="80.92" y="497.05" width="3.62" height="12.95" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="87.54" y="501.16" width="3.62" height="8.84" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="94.15" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="100.77" y="503.37" width="3.62" height="6.63" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="107.38" y="498.40" width="3.62" height="11.60" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="100.77" y="503.68" width="3.62" height="6.32" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="107.38" y="498.95" width="3.62" height="11.05" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="114.00" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="120.62" y="492.44" width="3.62" height="17.56" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="120.62" y="493.26" width="3.62" height="16.74" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="127.23" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="133.85" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="140.46" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="147.08" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
-<rect x="153.69" y="506.69" width="3.62" height="3.31" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="160.31" y="503.37" width="3.62" height="6.63" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="153.69" y="506.84" width="3.62" height="3.16" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="160.31" y="503.68" width="3.62" height="6.32" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="166.92" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="173.54" y="486.81" width="3.62" height="23.19" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="180.15" y="502.71" width="3.62" height="7.29" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="186.77" y="504.70" width="3.62" height="5.30" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="173.54" y="487.89" width="3.62" height="22.11" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="180.15" y="503.05" width="3.62" height="6.95" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="186.77" y="504.95" width="3.62" height="5.05" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="193.38" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="200.00" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="206.62" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="213.23" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="219.85" y="506.36" width="3.62" height="3.64" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="219.85" y="506.53" width="3.62" height="3.47" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="226.46" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
-<rect x="233.08" y="504.37" width="3.62" height="5.63" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="233.08" y="504.63" width="3.62" height="5.37" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="239.69" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
-<rect x="246.31" y="507.35" width="3.62" height="2.65" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="252.92" y="496.75" width="3.62" height="13.25" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="259.54" y="505.36" width="3.62" height="4.64" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="266.15" y="500.72" width="3.62" height="9.28" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="272.77" y="504.70" width="3.62" height="5.30" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="279.38" y="506.69" width="3.62" height="3.31" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="246.31" y="507.47" width="3.62" height="2.53" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="252.92" y="497.37" width="3.62" height="12.63" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="259.54" y="505.58" width="3.62" height="4.42" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="266.15" y="501.16" width="3.62" height="8.84" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="272.77" y="504.95" width="3.62" height="5.05" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="279.38" y="506.84" width="3.62" height="3.16" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="286.00" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="292.62" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="299.23" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="305.85" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="312.46" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="319.08" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="325.69" y="489.46" width="3.62" height="20.54" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="332.31" y="475.21" width="3.62" height="34.79" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="338.92" y="482.50" width="3.62" height="27.50" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="345.54" y="469.91" width="3.62" height="40.09" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="352.15" y="506.69" width="3.62" height="3.31" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="358.77" y="467.26" width="3.62" height="42.74" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="365.38" y="504.37" width="3.62" height="5.63" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="325.69" y="490.42" width="3.62" height="19.58" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="332.31" y="466.11" width="3.62" height="43.89" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="338.92" y="472.11" width="3.62" height="37.89" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="345.54" y="456.00" width="3.62" height="54.00" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="352.15" y="506.84" width="3.62" height="3.16" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="358.77" y="465.79" width="3.62" height="44.21" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="365.38" y="501.47" width="3.62" height="8.53" rx="1" fill="var(--c1)" opacity="0.85"/>
 <text x="28" y="527" class="label">52 weeks ago</text>
 <text x="372" y="527" class="label" text-anchor="end">This week</text>
 <text x="28" y="564" class="label">Selected projects</text>
