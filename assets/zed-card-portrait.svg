@@ -53,7 +53,7 @@
 <text x="142.66666666666669" y="395" class="muted">UI 35%</text>
 <text x="257.33333333333337" y="395" class="muted">Systems 20%</text>
 <text x="28" y="434" class="label">Activity</text>
-<text x="372" y="434" class="muted" text-anchor="end">1,321 contributions / 52 weeks</text>
+<text x="372" y="434" class="muted" text-anchor="end">1,323 contributions / 52 weeks</text>
 <rect x="28.00" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="34.62" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
 <rect x="41.23" y="508.00" width="3.62" height="2.00" rx="1" fill="var(--c1)" opacity="0.28"/>
@@ -105,7 +105,7 @@
 <rect x="345.54" y="456.00" width="3.62" height="54.00" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="352.15" y="506.84" width="3.62" height="3.16" rx="1" fill="var(--c1)" opacity="0.85"/>
 <rect x="358.77" y="465.79" width="3.62" height="44.21" rx="1" fill="var(--c1)" opacity="0.85"/>
-<rect x="365.38" y="500.21" width="3.62" height="9.79" rx="1" fill="var(--c1)" opacity="0.85"/>
+<rect x="365.38" y="499.58" width="3.62" height="10.42" rx="1" fill="var(--c1)" opacity="0.85"/>
 <text x="28" y="527" class="label">52 weeks ago</text>
 <text x="372" y="527" class="label" text-anchor="end">This week</text>
 <text x="28" y="564" class="label">Selected projects</text>
